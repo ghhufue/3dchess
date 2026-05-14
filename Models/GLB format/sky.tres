@@ -1,0 +1,11 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://do8ko3u05anph"]
+
+[ext_resource type="Texture2D" uid="uid://da5hijilxl7ht" path="res://UIpack/sky.png" id="1_kcwd1"]
+
+[resource]
+resource_name = "colormap"
+cull_mode = 2
+albedo_color = Color(0.91794133, 0.6557883, 0.8750696, 1)
+albedo_texture = ExtResource("1_kcwd1")
+metallic_specular = 1.0
+texture_filter = 2

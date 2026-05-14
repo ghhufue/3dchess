@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://d4m71yxspu0dh"]
+
+[ext_resource type="Texture2D" uid="uid://b7ud3uwepyk45" path="res://Models/GLB format/Textures/colormap.png" id="1_7vb2a"]
+
+[resource]
+resource_name = "colormap"
+cull_mode = 2
+albedo_texture = ExtResource("1_7vb2a")
+texture_filter = 2

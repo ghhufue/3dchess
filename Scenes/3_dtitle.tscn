@@ -1,0 +1,75 @@
+[gd_scene format=3 uid="uid://bewhprvqg47xd"]
+
+[ext_resource type="PackedScene" uid="uid://cpumix6r6xnav" path="res://Scenes/title.tscn" id="1_xmg6g"]
+[ext_resource type="Script" uid="uid://yeqfl8nl5ntv" path="res://Scripts/Visual/3dbd.gd" id="2_3iba1"]
+[ext_resource type="PackedScene" uid="uid://ccbe7ciawotll" path="res://Models/GLB format/stone-mountain.glb" id="2_ojp1x"]
+[ext_resource type="PackedScene" uid="uid://cy1pke36gftu4" path="res://Models/GLB format/stone-hill.glb" id="4_c11tk"]
+[ext_resource type="PackedScene" uid="uid://brds8hu7n3vr3" path="res://Models/GLB format/stone-rocks.glb" id="5_yvxeu"]
+[ext_resource type="PackedScene" uid="uid://drb7kk7pvxbqo" path="res://Models/GLB format/water-rocks.glb" id="6_3iba1"]
+[ext_resource type="PackedScene" uid="uid://bqkjf531pathu" path="res://Models/GLB format/building-watermill.glb" id="6_yvxeu"]
+[ext_resource type="PackedScene" uid="uid://btia0v0suy74e" path="res://Models/GLB format/water.glb" id="7_24vs7"]
+[ext_resource type="Material" uid="uid://do8ko3u05anph" path="res://Models/GLB format/sky.tres" id="9_8ghy5"]
+[ext_resource type="Script" uid="uid://bvc3j5yrdncu3" path="res://Scripts/Visual/mesh_instance_3d.gd" id="10_lvpkr"]
+
+[sub_resource type="Environment" id="Environment_ojp1x"]
+background_mode = 1
+background_color = Color(0.24318144, 0.6994197, 0.6262542, 1)
+reflected_light_source = 1
+ssr_enabled = true
+adjustment_enabled = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_lvpkr"]
+
+[node name="3Dtitle" type="Node3D" unique_id=1275700734]
+
+[node name="title" parent="." unique_id=1257010544 instance=ExtResource("1_xmg6g")]
+show_behind_parent = true
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1777271752]
+transform = Transform3D(1, 0, 0, 0, 0.8419537, 0.5395498, 0, -0.5395498, 0.8419537, 0.8110132, 1.9225903, 2.8888474)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=142759575]
+environment = SubResource("Environment_ojp1x")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2124346478]
+transform = Transform3D(0.9981904, -0.056763362, -0.019846655, 0.04712659, 0.53345096, 0.8445172, -0.037350416, -0.8439242, 0.53516066, 6.6356688, 3.2040205, 3.8415732)
+
+[node name="bd" type="Node3D" parent="." unique_id=1516518560]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.82855654, 0.22268414, 0.599965)
+script = ExtResource("2_3iba1")
+
+[node name="stone-mountain2" parent="bd" unique_id=1574493442 instance=ExtResource("2_ojp1x")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.008063197, -0.060460925, -0.05549276)
+
+[node name="stone-rocks2" parent="bd" unique_id=1317724658 instance=ExtResource("5_yvxeu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.47448695, -0.22268414, -0.9203204)
+
+[node name="stone-hill2" parent="bd" unique_id=654204119 instance=ExtResource("4_c11tk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0026829, -0.22268414, -0.08813524)
+
+[node name="water-rocks2" parent="bd" unique_id=650208454 instance=ExtResource("6_3iba1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9406531, -0.12144756, -0.05377698)
+
+[node name="water-rocks3" parent="bd" unique_id=1581362632 instance=ExtResource("6_3iba1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5216979, -0.0877763, 0.75965524)
+
+[node name="building-watermill2" parent="bd" unique_id=150761445 instance=ExtResource("6_yvxeu")]
+transform = Transform3D(-0.50000006, 0, -0.8660254, 0, 1, 0, 0.8660254, 0, -0.50000006, 0.45675707, -0.22268426, 0.7811452)
+
+[node name="water-rocks4" parent="bd" unique_id=610021900 instance=ExtResource("6_3iba1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.48056293, -0.1238243, -0.8806899)
+
+[node name="water2" parent="bd" unique_id=1172016212 instance=ExtResource("7_24vs7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5472768, -0.22268414, 0.7678137)
+
+[node name="water3" parent="bd" unique_id=1186091550 instance=ExtResource("7_24vs7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4837461, -0.22268414, -0.9258685)
+
+[node name="water4" parent="bd" unique_id=1021104097 instance=ExtResource("7_24vs7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9823773, -0.22268414, -0.04830897)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1623945003]
+transform = Transform3D(10, 0, 0, 0, 2.7012014, -4.207554, 0, 4.207554, 2.7012014, 0.7274685, -0.6526563, -2.231218)
+material_override = ExtResource("9_8ghy5")
+mesh = SubResource("PlaneMesh_lvpkr")
+script = ExtResource("10_lvpkr")
