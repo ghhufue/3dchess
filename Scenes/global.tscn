@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dfqstjkm7nk40"]
 
-[ext_resource type="Script" uid="uid://by3u54y6468am" path="res://Scripts/global.gd" id="1_koean"]
+[ext_resource type="Script" uid="uid://by3u54y6468am" path="res://Scripts/Core/global.gd" id="1_koean"]
 [ext_resource type="AudioStream" uid="uid://8hibsq3f40yw" path="res://sound/bgm.mp3" id="2_o8ivi"]
 
 [node name="Global" type="Node" unique_id=972014780]

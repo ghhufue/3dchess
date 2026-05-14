@@ -1,15 +1,15 @@
 [gd_scene format=3 uid="uid://cpumix6r6xnav"]
 
-[ext_resource type="Script" uid="uid://iaola1thipx7" path="res://Scripts/title.gd" id="1_w31pl"]
+[ext_resource type="Script" path="res://Scripts/UI/main_menu.gd" id="1_w31pl"]
 [ext_resource type="FontFile" uid="uid://hqpa84d2dqvp" path="res://fonts/Better VCR 9.0.1.ttf" id="2_ekrfg"]
 [ext_resource type="FontFile" uid="uid://dr201ov4c76pb" path="res://fonts/Crackman.otf" id="3_2qdx2"]
 [ext_resource type="StyleBox" uid="uid://k2dber636iwh" path="res://Settings/button.tres" id="3_fp2oq"]
 [ext_resource type="FontFile" uid="uid://dhmwvny2scgqs" path="res://fonts/RubikGlitch-Regular.ttf" id="4_6aagf"]
 [ext_resource type="StyleBox" uid="uid://b1gm56r4jx03g" path="res://Settings/button2.tres" id="4_q2qps"]
-[ext_resource type="Script" uid="uid://dmiawyqejlocg" path="res://Scripts/button_pc.gd" id="5_yosvi"]
+[ext_resource type="Script" uid="uid://dmiawyqejlocg" path="res://Scripts/UI/Button/menu_action_button.gd" id="5_yosvi"]
 [ext_resource type="StyleBox" uid="uid://bclv622vee5pu" path="res://Settings/buttonback.tres" id="6_kyk5u"]
-[ext_resource type="Script" uid="uid://hwjkwvyii26m" path="res://Scripts/button_pc_3.gd" id="7_3eqdi"]
-[ext_resource type="Script" uid="uid://c2yvly16l3h8e" path="res://Scripts/button_pc_2.gd" id="7_yu0ss"]
+[ext_resource type="PackedScene" uid="uid://cwwnpxi5u1i12" path="res://Scenes/OfflineModeSelect.tscn" id="9_cmrfp"]
+[ext_resource type="PackedScene" uid="uid://d2vw2qfe4iuvq" path="res://Scenes/OnlineModeSelect.tscn" id="10_online"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2qdx2"]
 bg_color = Color(0, 0, 0, 0.09411765)
@@ -18,7 +18,7 @@ corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
-[node name="title" type="Control" unique_id=1257010544]
+[node name="MainMenu" type="Control" unique_id=1257010544]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -64,68 +64,52 @@ theme_override_font_sizes/font_size = 25
 text = "which model
 "
 
-[node name="ButtonPC" type="Button" parent="." unique_id=591896043]
+[node name="OfflinePlayButton" type="Button" parent="." unique_id=591896043]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.079
 anchor_top = 0.282
 anchor_right = 0.26500002
 anchor_bottom = 0.45600003
-offset_left = -0.6799774
-offset_top = 36.440033
-offset_right = -17.799988
-offset_bottom = 37.51996
+offset_left = -32.679993
+offset_top = -132.55998
+offset_right = 250.84793
+offset_bottom = -130.2561
 rotation = -0.108422734
 theme_override_fonts/font = ExtResource("4_6aagf")
 theme_override_font_sizes/font_size = 55
 theme_override_styles/normal = ExtResource("3_fp2oq")
 theme_override_styles/pressed = ExtResource("6_kyk5u")
 theme_override_styles/hover = ExtResource("4_q2qps")
-text = "VS PCbot"
+text = "OFFLINE PLAY"
 expand_icon = true
 script = ExtResource("5_yosvi")
+change_scene_on_pressed = true
+target_scene = ExtResource("9_cmrfp")
 
-[node name="ButtonPC2" type="Button" parent="." unique_id=745719616]
+[node name="OnlineMatchButton" type="Button" parent="." unique_id=745719616]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.15300001
 anchor_top = 0.097
 anchor_right = 0.33
 anchor_bottom = 0.252
-offset_left = 1058.24
-offset_top = 181.23999
-offset_right = 1190.4084
-offset_bottom = 202.83997
+offset_left = 954.2401
+offset_top = -21.759987
+offset_right = 1224.397
+offset_bottom = 17.865692
 rotation = 0.20889728
 theme_override_fonts/font = ExtResource("4_6aagf")
 theme_override_font_sizes/font_size = 55
 theme_override_styles/normal = ExtResource("3_fp2oq")
 theme_override_styles/pressed = ExtResource("6_kyk5u")
 theme_override_styles/hover = ExtResource("4_q2qps")
-text = "VS Trainedbot"
+text = "ONLINE MATCH"
 expand_icon = true
-script = ExtResource("7_yu0ss")
-
-[node name="ButtonPC3" type="Button" parent="." unique_id=919883415]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.15300001
-anchor_top = 0.097
-anchor_right = 0.33
-anchor_bottom = 0.252
-offset_left = 319.24
-offset_top = -56.760002
-offset_right = 635.39996
-offset_bottom = -35.160004
-theme_override_fonts/font = ExtResource("4_6aagf")
-theme_override_font_sizes/font_size = 55
-theme_override_styles/normal = ExtResource("3_fp2oq")
-theme_override_styles/pressed = ExtResource("6_kyk5u")
-theme_override_styles/hover = ExtResource("4_q2qps")
-text = "PCbot vs Trainedbot
-"
-expand_icon = true
-script = ExtResource("7_3eqdi")
+script = ExtResource("5_yosvi")
+speed = 1.5
+change_scene_on_pressed = true
+target_scene = ExtResource("10_online")
 
 [node name="ButtonSelectModel" type="Button" parent="." unique_id=929148416]
 layout_mode = 1
@@ -152,10 +136,6 @@ anchor_left = 0.08
 anchor_top = 0.75
 anchor_right = 0.35
 anchor_bottom = 0.81
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 0.0
-offset_bottom = 0.0
 theme_override_fonts/font = ExtResource("2_ekrfg")
 theme_override_font_sizes/font_size = 22
 text = "Simple pieces (black/white hemispheres)"

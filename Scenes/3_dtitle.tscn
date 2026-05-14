@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bewhprvqg47xd"]
 
-[ext_resource type="PackedScene" uid="uid://cpumix6r6xnav" path="res://Scenes/title.tscn" id="1_xmg6g"]
+[ext_resource type="PackedScene" uid="uid://cpumix6r6xnav" path="res://Scenes/MainMenu.tscn" id="1_xmg6g"]
 [ext_resource type="Script" uid="uid://yeqfl8nl5ntv" path="res://Scripts/Visual/3dbd.gd" id="2_3iba1"]
 [ext_resource type="PackedScene" uid="uid://ccbe7ciawotll" path="res://Models/GLB format/stone-mountain.glb" id="2_ojp1x"]
 [ext_resource type="PackedScene" uid="uid://cy1pke36gftu4" path="res://Models/GLB format/stone-hill.glb" id="4_c11tk"]

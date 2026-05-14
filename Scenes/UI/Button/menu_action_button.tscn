@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://dmiawyqejlocg" path="res://Scripts/UI/Button/menu_action_button.gd" id="1_animated_button"]
+
+[node name="MenuActionButton" type="Button"]
+custom_minimum_size = Vector2(220, 72)
+text = "Button"
+script = ExtResource("1_animated_button")
