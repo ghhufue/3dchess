@@ -8,6 +8,7 @@
 [ext_resource type="FontFile" uid="uid://hqpa84d2dqvp" path="res://fonts/Better VCR 9.0.1.ttf" id="7_v158k"]
 [ext_resource type="Script" uid="uid://b22xgtg0iug0s" path="res://Scripts/Camera/camera_rig.gd" id="9_h4fw4"]
 [ext_resource type="AudioStream" uid="uid://c2mkqro1rgnmq" path="res://sound/people.mp3" id="17_ewbju"]
+[ext_resource type="Script" path="res://Scripts/Providers/online_match_client.gd" id="18_online_match"]
 
 [sub_resource type="Environment" id="Environment_i6g32"]
 background_mode = 1
@@ -85,6 +86,9 @@ script = ExtResource("4_v158k")
 
 [node name="LocalHttpMoveProvider" type="Node" parent="Manager" unique_id=1104631290]
 script = ExtResource("5_h4fw4")
+
+[node name="OnlineMatchClient" type="Node" parent="Manager" unique_id=1412186853]
+script = ExtResource("18_online_match")
 
 [node name="CameraRig" type="Node3D" parent="." unique_id=1946414270]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.4872146, 0, 6.514561)

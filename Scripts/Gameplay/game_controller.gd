@@ -11,6 +11,7 @@ const WHITE := -1
 @export var board_view_path: NodePath = NodePath("../BoardView")
 @export var board_input_path: NodePath = NodePath("../../BoardInput")
 @export var local_move_provider_path: NodePath = NodePath("../LocalHttpMoveProvider")
+@export var online_match_client_path: NodePath = NodePath("../OnlineMatchClient")
 @export var bot_label_path: NodePath = NodePath("../../UI/BotLabel")
 @export var abort_button_path: NodePath = NodePath("../../UI/AbortButton")
 @export var next_step_button_path: NodePath = NodePath("../../UI/Button")
@@ -19,6 +20,7 @@ const WHITE := -1
 @onready var board_view: Node = get_node_or_null(board_view_path)
 @onready var board_input: Node = get_node_or_null(board_input_path)
 @onready var local_move_provider: Node = get_node_or_null(local_move_provider_path)
+@onready var online_match_client: Node = get_node_or_null(online_match_client_path)
 @onready var bot_label: Label = get_node_or_null(bot_label_path)
 @onready var abort_button: Button = get_node_or_null(abort_button_path)
 @onready var next_step_button: Button = get_node_or_null(next_step_button_path)
@@ -28,6 +30,8 @@ var current_player := BLACK
 var game_over := false
 var ai_waiting := false
 var pending_ai_player := EMPTY
+var pending_online_request_id := ""
+var pending_online_room_id := ""
 
 func _ready() -> void:
 	_reset_game()
@@ -61,6 +65,24 @@ func _connect_nodes() -> void:
 		if local_move_provider.has_signal("move_failed") and not local_move_provider.move_failed.is_connected(_on_provider_move_failed):
 			local_move_provider.move_failed.connect(_on_provider_move_failed)
 
+	if online_match_client != null:
+		if online_match_client.has_signal("connected") and not online_match_client.connected.is_connected(_on_online_connected):
+			online_match_client.connected.connect(_on_online_connected)
+		if online_match_client.has_signal("room_created") and not online_match_client.room_created.is_connected(_on_online_room_ready):
+			online_match_client.room_created.connect(_on_online_room_ready)
+		if online_match_client.has_signal("room_joined") and not online_match_client.room_joined.is_connected(_on_online_room_ready):
+			online_match_client.room_joined.connect(_on_online_room_ready)
+		if online_match_client.has_signal("game_started") and not online_match_client.game_started.is_connected(_on_online_game_started):
+			online_match_client.game_started.connect(_on_online_game_started)
+		if online_match_client.has_signal("turn_requested") and not online_match_client.turn_requested.is_connected(_on_online_turn_requested):
+			online_match_client.turn_requested.connect(_on_online_turn_requested)
+		if online_match_client.has_signal("move_result") and not online_match_client.move_result.is_connected(_on_online_move_result):
+			online_match_client.move_result.connect(_on_online_move_result)
+		if online_match_client.has_signal("game_over") and not online_match_client.game_over.is_connected(_on_online_game_over):
+			online_match_client.game_over.connect(_on_online_game_over)
+		if online_match_client.has_signal("server_error") and not online_match_client.server_error.is_connected(_on_online_server_error):
+			online_match_client.server_error.connect(_on_online_server_error)
+
 	if is_instance_valid(abort_button) and not abort_button.pressed.is_connected(_on_abort_pressed):
 		abort_button.pressed.connect(_on_abort_pressed)
 
@@ -77,17 +99,24 @@ func _configure_ui() -> void:
 		next_step_button.disabled = false
 
 	if is_instance_valid(bot_label):
-		if Global.game_mode == "bot_vs_bot_step":
+		if Global.game_mode == "online_model_vs_model":
+			bot_label.text = "Online: connecting..."
+		elif Global.game_mode == "bot_vs_bot_step":
 			bot_label.text = "Player1: %s  vs  Player2: %s" % [Global.black_bot_name, Global.white_bot_name]
 		else:
 			var label_text = Global.trained_model_label if Global.bot_name == "trained" else Global.bot_name
 			bot_label.text = "Bot: " + label_text
+
+	if Global.game_mode == "online_model_vs_model":
+		_start_online_match()
 
 func _on_abort_pressed() -> void:
 	_end_game("Game aborted")
 
 func _on_cell_clicked(row: int, col: int) -> void:
 	if game_over:
+		return
+	if Global.game_mode == "online_model_vs_model":
 		return
 	if Global.game_mode == "bot_vs_bot_step":
 		return
@@ -138,6 +167,14 @@ func _on_provider_move_ready(row: int, col: int) -> void:
 		return
 
 	ai_waiting = false
+	if Global.game_mode == "online_model_vs_model":
+		if online_match_client != null and online_match_client.has_method("send_move"):
+			online_match_client.send_move(pending_online_room_id, pending_online_request_id, row, col)
+		pending_online_request_id = ""
+		pending_online_room_id = ""
+		pending_ai_player = EMPTY
+		return
+
 	var player := pending_ai_player
 	if player == EMPTY:
 		player = current_player
@@ -150,6 +187,8 @@ func _on_provider_move_ready(row: int, col: int) -> void:
 func _on_provider_move_failed(message: String) -> void:
 	ai_waiting = false
 	pending_ai_player = EMPTY
+	pending_online_request_id = ""
+	pending_online_room_id = ""
 	push_warning(message)
 
 func _try_apply_move(row: int, col: int, player: int) -> void:
@@ -238,3 +277,109 @@ func _end_game(text: String) -> void:
 	pending_ai_player = EMPTY
 	Global.winner_text = text
 	get_tree().change_scene_to_file(title_scene_path)
+
+
+func _start_online_match() -> void:
+	if online_match_client == null or not online_match_client.has_method("connect_to_server"):
+		_on_online_server_error("NO_CLIENT", "No online match client is configured")
+		return
+
+	online_match_client.connect_to_server(Global.match_server_url)
+
+
+func _on_online_connected() -> void:
+	if online_match_client == null:
+		return
+
+	if Global.online_create_room:
+		online_match_client.create_room(Global.online_player_name, Global.online_model_name)
+	else:
+		online_match_client.join_room(Global.online_join_room_id, Global.online_player_name, Global.online_model_name)
+
+
+func _on_online_room_ready(room_id: String, player_id: String, color: int) -> void:
+	Global.online_room_id = room_id
+	Global.online_player_id = player_id
+	Global.online_player_color = color
+
+	if is_instance_valid(bot_label):
+		var color_name := "Black" if color == BLACK else "White"
+		bot_label.text = "Room %s  %s  waiting..." % [room_id, color_name]
+
+
+func _on_online_game_started(payload: Dictionary) -> void:
+	_load_board_from_server(payload.get("board", []))
+	current_player = int(payload.get("current_turn", BLACK))
+	game_over = false
+
+	if is_instance_valid(bot_label):
+		bot_label.text = "Online %s vs %s" % [
+			str(payload.get("black_model", "black")),
+			str(payload.get("white_model", "white")),
+		]
+
+
+func _on_online_turn_requested(payload: Dictionary) -> void:
+	if game_over or ai_waiting:
+		return
+
+	var turn_player := int(payload.get("player", EMPTY))
+	if turn_player != Global.online_player_color:
+		return
+
+	board = payload.get("board", board)
+	current_player = turn_player
+	pending_ai_player = turn_player
+	pending_online_request_id = str(payload.get("request_id", ""))
+	pending_online_room_id = str(payload.get("room_id", Global.online_room_id))
+
+	_request_local_ai_for_current_player(Global.online_model_name)
+
+
+func _on_online_move_result(payload: Dictionary) -> void:
+	var row := int(payload.get("row", payload.get("y", -1)))
+	var col := int(payload.get("col", payload.get("x", -1)))
+	var player := int(payload.get("player", EMPTY))
+	if _is_in_bounds(row, col) and board[row][col] == EMPTY:
+		board[row][col] = player
+		if board_view != null and board_view.has_method("render_move"):
+			board_view.render_move(row, col, player)
+
+	current_player = int(payload.get("next_turn", -player))
+
+
+func _on_online_game_over(payload: Dictionary) -> void:
+	var winner := int(payload.get("winner", EMPTY))
+	var text := "Draw"
+	if winner == BLACK:
+		text = "Black model win"
+	elif winner == WHITE:
+		text = "White model win"
+	_end_game(text)
+
+
+func _on_online_server_error(code: String, message: String) -> void:
+	push_warning("[%s] %s" % [code, message])
+
+
+func _load_board_from_server(server_board) -> void:
+	if not (server_board is Array):
+		return
+
+	board.clear()
+	for r in range(BOARD_SIZE):
+		var row := []
+		for c in range(BOARD_SIZE):
+			var value := EMPTY
+			if r < server_board.size() and server_board[r] is Array and c < server_board[r].size():
+				value = int(server_board[r][c])
+			row.append(value)
+		board.append(row)
+
+	if board_view != null and board_view.has_method("reset_board"):
+		board_view.reset_board()
+
+	for r in range(BOARD_SIZE):
+		for c in range(BOARD_SIZE):
+			if board[r][c] != EMPTY and board_view != null and board_view.has_method("render_move"):
+				board_view.render_move(r, c, board[r][c])
