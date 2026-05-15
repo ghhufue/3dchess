@@ -1,0 +1,281 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/UI/online_player_setup.gd" id="1_setup"]
+[ext_resource type="Texture2D" path="res://UIpack/sky.png" id="2_sky"]
+[ext_resource type="Texture2D" uid="uid://ck6lnbw5ixmc2" path="res://UIpack/Icon1.png" id="3_avatar_a"]
+[ext_resource type="Texture2D" uid="uid://cc4ljgonb6yav" path="res://UIpack/icon2.png" id="4_avatar_b"]
+[ext_resource type="Texture2D" uid="uid://dc08ydfwiu05f" path="res://UIpack/Icon3.png" id="5_avatar_c"]
+[ext_resource type="FontFile" uid="uid://fbh8tvoy7egm" path="res://fonts/slkscr.ttf" id="6_font"]
+[ext_resource type="FontFile" uid="uid://dhmwvny2scgqs" path="res://fonts/RubikGlitch-Regular.ttf" id="7_title_font"]
+
+[sub_resource type="StyleBoxFlat" id="PanelStyle"]
+bg_color = Color(0.06, 0.15, 0.21, 0.84)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.95, 1, 0.62)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0, 0.75, 1, 0.22)
+shadow_size = 14
+
+[sub_resource type="StyleBoxFlat" id="ButtonNormal"]
+bg_color = Color(0.12, 0.45, 0.95, 0.28)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.65, 0.95, 1, 0.45)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="ButtonHover"]
+bg_color = Color(0.1, 0.75, 1, 0.38)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.75, 1, 1, 0.9)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="ButtonPressed"]
+bg_color = Color(0, 0.55, 0.8, 0.55)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="OnlinePlayerSetup" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_setup")
+avatars = Array[Texture2D]([ExtResource("3_avatar_a"), ExtResource("4_avatar_b"), ExtResource("5_avatar_c")])
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_sky")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ModeLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 96.0
+offset_top = 62.0
+offset_right = 920.0
+offset_bottom = 132.0
+theme_override_colors/font_color = Color(0.78, 1, 1, 1)
+theme_override_fonts/font = ExtResource("7_title_font")
+theme_override_font_sizes/font_size = 52
+text = "CREATE ROOM"
+
+[node name="SettingsButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1690.0
+offset_top = 58.0
+offset_right = 1788.0
+offset_bottom = 132.0
+theme_override_fonts/font = ExtResource("6_font")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("ButtonNormal")
+theme_override_styles/hover = SubResource("ButtonHover")
+theme_override_styles/pressed = SubResource("ButtonPressed")
+text = "⚙"
+
+[node name="Players" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 210.0
+offset_right = 1788.0
+offset_bottom = 740.0
+theme_override_constants/separation = 120
+alignment = 1
+
+[node name="LocalProfile" type="Panel" parent="Players"]
+custom_minimum_size = Vector2(640, 500)
+layout_mode = 2
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="VBox" type="VBoxContainer" parent="Players/LocalProfile"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 70.0
+offset_top = 48.0
+offset_right = -70.0
+offset_bottom = -54.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 34
+alignment = 1
+
+[node name="AvatarFrame" type="CenterContainer" parent="Players/LocalProfile/VBox"]
+custom_minimum_size = Vector2(0, 250)
+layout_mode = 2
+
+[node name="AvatarButton" type="TextureButton" parent="Players/LocalProfile/VBox/AvatarFrame"]
+custom_minimum_size = Vector2(220, 220)
+layout_mode = 2
+
+[node name="AvatarImage" type="TextureRect" parent="Players/LocalProfile/VBox/AvatarFrame/AvatarButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_avatar_a")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameInput" type="LineEdit" parent="Players/LocalProfile/VBox"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "godot_model"
+placeholder_text = "Your display name"
+
+[node name="OpponentProfile" type="Panel" parent="Players"]
+visible = false
+custom_minimum_size = Vector2(640, 500)
+layout_mode = 2
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="VBox" type="VBoxContainer" parent="Players/OpponentProfile"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 70.0
+offset_top = 48.0
+offset_right = -70.0
+offset_bottom = -54.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 34
+alignment = 1
+
+[node name="AvatarFrame" type="CenterContainer" parent="Players/OpponentProfile/VBox"]
+custom_minimum_size = Vector2(0, 250)
+layout_mode = 2
+
+[node name="AvatarPreview" type="TextureRect" parent="Players/OpponentProfile/VBox/AvatarFrame"]
+custom_minimum_size = Vector2(220, 220)
+layout_mode = 2
+texture = ExtResource("4_avatar_b")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RoomInput" type="LineEdit" parent="Players/OpponentProfile/VBox"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+placeholder_text = "Room id"
+max_length = 6
+
+[node name="SetupStatus" type="Label" parent="."]
+layout_mode = 0
+offset_left = 174.0
+offset_top = 770.0
+offset_right = 1406.0
+offset_bottom = 840.0
+theme_override_colors/font_color = Color(0.92, 0.98, 1, 1)
+theme_override_fonts/font = ExtResource("6_font")
+theme_override_font_sizes/font_size = 24
+text = "Create a room and wait for another player."
+autowrap_mode = 3
+
+[node name="BackButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 110.0
+offset_top = 902.0
+offset_right = 330.0
+offset_bottom = 988.0
+theme_override_fonts/font = ExtResource("6_font")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("ButtonNormal")
+theme_override_styles/hover = SubResource("ButtonHover")
+theme_override_styles/pressed = SubResource("ButtonPressed")
+text = "< BACK"
+
+[node name="StartButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1510.0
+offset_top = 880.0
+offset_right = 1788.0
+offset_bottom = 996.0
+theme_override_fonts/font = ExtResource("7_title_font")
+theme_override_font_sizes/font_size = 52
+theme_override_styles/normal = SubResource("ButtonNormal")
+theme_override_styles/hover = SubResource("ButtonHover")
+theme_override_styles/pressed = SubResource("ButtonPressed")
+text = "START"
+
+[node name="SettingsPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 1270.0
+offset_top = 148.0
+offset_right = 1818.0
+offset_bottom = 430.0
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="VBox" type="VBoxContainer" parent="SettingsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = 24.0
+offset_right = -30.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="SettingsTitle" type="Label" parent="SettingsPanel/VBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_font")
+theme_override_font_sizes/font_size = 26
+text = "MATCH SETTINGS"
+
+[node name="TimeLimitInput" type="SpinBox" parent="SettingsPanel/VBox"]
+layout_mode = 2
+min_value = 1.0
+max_value = 600.0
+value = 30.0
+suffix = " sec per move"
+
+[node name="CoordinatesCheck" type="CheckBox" parent="SettingsPanel/VBox"]
+layout_mode = 2
+text = "Show coordinates"
+
+[node name="CloseSettingsButton" type="Button" parent="SettingsPanel/VBox"]
+layout_mode = 2
+theme_override_styles/normal = SubResource("ButtonNormal")
+theme_override_styles/hover = SubResource("ButtonHover")
+theme_override_styles/pressed = SubResource("ButtonPressed")
+text = "DONE"

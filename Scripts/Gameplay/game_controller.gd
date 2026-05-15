@@ -68,6 +68,8 @@ func _connect_nodes() -> void:
 	if online_match_client != null:
 		if online_match_client.has_signal("connected") and not online_match_client.connected.is_connected(_on_online_connected):
 			online_match_client.connected.connect(_on_online_connected)
+		if online_match_client.has_signal("room_hosted") and not online_match_client.room_hosted.is_connected(_on_online_room_hosted):
+			online_match_client.room_hosted.connect(_on_online_room_hosted)
 		if online_match_client.has_signal("room_created") and not online_match_client.room_created.is_connected(_on_online_room_ready):
 			online_match_client.room_created.connect(_on_online_room_ready)
 		if online_match_client.has_signal("room_joined") and not online_match_client.room_joined.is_connected(_on_online_room_ready):
@@ -102,10 +104,15 @@ func _configure_ui() -> void:
 		if Global.game_mode == "online_model_vs_model":
 			bot_label.text = "Online: connecting..."
 		elif Global.game_mode == "bot_vs_bot_step":
-			bot_label.text = "Player1: %s  vs  Player2: %s" % [Global.black_bot_name, Global.white_bot_name]
+			bot_label.text = "Black: %s  vs  White: %s" % [
+				_player_label_for(BLACK),
+				_player_label_for(WHITE),
+			]
 		else:
-			var label_text = Global.trained_model_label if Global.bot_name == "trained" else Global.bot_name
-			bot_label.text = "Bot: " + label_text
+			bot_label.text = "Black: %s  vs  White: %s" % [
+				_player_label_for(BLACK),
+				_player_label_for(WHITE),
+			]
 
 	if Global.game_mode == "online_model_vs_model":
 		_start_online_match()
@@ -118,16 +125,15 @@ func _on_cell_clicked(row: int, col: int) -> void:
 		return
 	if Global.game_mode == "online_model_vs_model":
 		return
-	if Global.game_mode == "bot_vs_bot_step":
-		return
-	if current_player != BLACK:
+	if _player_type_for_player(current_player) != "human":
 		return
 
-	await _try_apply_move(row, col, BLACK)
+	var player := current_player
+	await _try_apply_move(row, col, player)
 
 	if not game_over:
-		current_player = WHITE
-		_request_local_ai_for_current_player()
+		current_player = -player
+		_request_local_player_for_current_player()
 
 func _on_next_step_pressed() -> void:
 	if Global.game_mode != "bot_vs_bot_step":
@@ -135,14 +141,20 @@ func _on_next_step_pressed() -> void:
 	if game_over or ai_waiting:
 		return
 
-	var bot_name := _bot_name_for_player(current_player)
-	_request_local_ai_for_current_player(bot_name)
+	if _player_type_for_player(current_player) == "human":
+		return
 
-func _request_local_ai_for_current_player(bot_name_override := "") -> void:
+	_request_local_player_for_current_player()
+
+func _request_local_player_for_current_player() -> void:
 	if game_over or ai_waiting:
 		return
 	if local_move_provider == null or not local_move_provider.has_method("request_move"):
 		_on_provider_move_failed("No local move provider is configured")
+		return
+
+	var player_type := _player_type_for_player(current_player)
+	if player_type == "human":
 		return
 
 	ai_waiting = true
@@ -160,7 +172,15 @@ func _request_local_ai_for_current_player(bot_name_override := "") -> void:
 		pending_ai_player = EMPTY
 		return
 
-	local_move_provider.request_move(board, current_player, bot_name_override)
+	local_move_provider.request_move(
+		board,
+		current_player,
+		player_type,
+		_player_name_for_player(current_player),
+		_engine_kind_for_player(current_player),
+		_engine_path_for_player(current_player),
+		_engine_args_for_player(current_player)
+	)
 
 func _on_provider_move_ready(row: int, col: int) -> void:
 	if game_over:
@@ -210,19 +230,19 @@ func _try_apply_move(row: int, col: int, player: int) -> void:
 		_end_game("Draw")
 
 func _find_win_line(row: int, col: int, player: int) -> Array[Vector2i]:
-	var dirs := [
+	var dirs: Array[Vector2i] = [
 		Vector2i(1, 0),
 		Vector2i(0, 1),
 		Vector2i(1, 1),
 		Vector2i(1, -1)
 	]
 
-	for d in dirs:
+	for d: Vector2i in dirs:
 		var line: Array[Vector2i] = []
 		line.append(Vector2i(row, col))
 
-		var r := row + d.y
-		var c := col + d.x
+		var r: int = row + d.y
+		var c: int = col + d.x
 		while _is_in_bounds(r, c) and board[r][c] == player:
 			line.append(Vector2i(r, c))
 			r += d.y
@@ -251,11 +271,44 @@ func _is_in_bounds(row: int, col: int) -> bool:
 	return row >= 0 and row < BOARD_SIZE and col >= 0 and col < BOARD_SIZE
 
 func _bot_name_for_player(player: int) -> String:
-	return Global.black_bot_name if player == BLACK else Global.white_bot_name
+	return _player_name_for_player(player)
+
+func _player_type_for_player(player: int) -> String:
+	var value := Global.black_player_type if player == BLACK else Global.white_player_type
+	value = str(value).strip_edges().to_lower()
+	if value in ["human", "bot", "model"]:
+		return value
+	return "human"
+
+func _player_name_for_player(player: int) -> String:
+	var value := Global.black_player_name if player == BLACK else Global.white_player_name
+	value = str(value).strip_edges()
+	if value != "":
+		return value
+
+	if player == BLACK:
+		return Global.black_bot_name
+	return Global.white_bot_name
+
+func _engine_kind_for_player(player: int) -> String:
+	return Global.black_engine_kind if player == BLACK else Global.white_engine_kind
+
+func _engine_path_for_player(player: int) -> String:
+	return Global.black_engine_path if player == BLACK else Global.white_engine_path
+
+func _engine_args_for_player(player: int) -> Array[String]:
+	return Global.black_engine_args if player == BLACK else Global.white_engine_args
+
+func _player_label_for(player: int) -> String:
+	var player_type := _player_type_for_player(player)
+	var player_name := _player_name_for_player(player)
+	if player_type == "human":
+		return "Human"
+	return "%s:%s" % [player_type.capitalize(), player_name]
 
 func _winner_text_for(player: int) -> String:
 	if Global.game_mode == "bot_vs_bot_step":
-		return "%s win" % _bot_name_for_player(player)
+		return "%s win" % _player_label_for(player)
 	if player == BLACK:
 		return "Player win"
 	return "PC win"
@@ -291,10 +344,22 @@ func _on_online_connected() -> void:
 	if online_match_client == null:
 		return
 
-	if Global.online_create_room:
+	if Global.online_spectator or Global.online_entry_action == "host":
+		online_match_client.host_game(Global.online_player_name)
+	elif Global.online_create_room:
 		online_match_client.create_room(Global.online_player_name, Global.online_model_name)
 	else:
 		online_match_client.join_room(Global.online_join_room_id, Global.online_player_name, Global.online_model_name)
+
+
+func _on_online_room_hosted(room_id: String, spectator_id: String) -> void:
+	Global.online_room_id = room_id
+	Global.online_player_id = spectator_id
+	Global.online_player_color = EMPTY
+	Global.online_spectator = true
+
+	if is_instance_valid(bot_label):
+		bot_label.text = "Host room %s  waiting for players..." % room_id
 
 
 func _on_online_room_ready(room_id: String, player_id: String, color: int) -> void:
@@ -311,6 +376,7 @@ func _on_online_game_started(payload: Dictionary) -> void:
 	_load_board_from_server(payload.get("board", []))
 	current_player = int(payload.get("current_turn", BLACK))
 	game_over = false
+	_update_online_opponent_from_payload(payload)
 
 	if is_instance_valid(bot_label):
 		bot_label.text = "Online %s vs %s" % [
@@ -319,8 +385,27 @@ func _on_online_game_started(payload: Dictionary) -> void:
 		]
 
 
+func _update_online_opponent_from_payload(payload: Dictionary) -> void:
+	var black_name := str(payload.get("black_player", ""))
+	var white_name := str(payload.get("white_player", ""))
+	var black_avatar := int(payload.get("black_avatar_index", 0))
+	var white_avatar := int(payload.get("white_avatar_index", 0))
+
+	if Global.online_player_color == BLACK:
+		Global.online_opponent_name = white_name
+		Global.online_opponent_avatar_index = white_avatar
+	elif Global.online_player_color == WHITE:
+		Global.online_opponent_name = black_name
+		Global.online_opponent_avatar_index = black_avatar
+	else:
+		Global.online_opponent_name = "%s vs %s" % [black_name, white_name]
+		Global.online_opponent_avatar_index = black_avatar
+
+
 func _on_online_turn_requested(payload: Dictionary) -> void:
 	if game_over or ai_waiting:
+		return
+	if Global.online_spectator:
 		return
 
 	var turn_player := int(payload.get("player", EMPTY))
@@ -333,7 +418,19 @@ func _on_online_turn_requested(payload: Dictionary) -> void:
 	pending_online_request_id = str(payload.get("request_id", ""))
 	pending_online_room_id = str(payload.get("room_id", Global.online_room_id))
 
-	_request_local_ai_for_current_player(Global.online_model_name)
+	if local_move_provider != null and local_move_provider.has_method("request_move"):
+		ai_waiting = true
+		local_move_provider.request_move(
+			board,
+			current_player,
+			"model",
+			Global.online_model_name,
+			Global.online_engine_kind,
+			Global.online_engine_path,
+			Global.online_engine_args
+		)
+	else:
+		_on_provider_move_failed("No local move provider is configured")
 
 
 func _on_online_move_result(payload: Dictionary) -> void:

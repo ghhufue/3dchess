@@ -2,8 +2,10 @@ extends Node
 
 signal connected
 signal connection_failed(message: String)
+signal room_hosted(room_id: String, spectator_id: String)
 signal room_created(room_id: String, player_id: String, color: int)
 signal room_joined(room_id: String, player_id: String, color: int)
+signal match_history(records: Array)
 signal game_started(payload: Dictionary)
 signal turn_requested(payload: Dictionary)
 signal move_result(payload: Dictionary)
@@ -43,6 +45,14 @@ func create_room(player_name: String, model_name: String) -> void:
 		"type": "create_room",
 		"player_name": player_name,
 		"model_name": model_name,
+		"avatar_index": Global.online_avatar_index,
+	})
+
+
+func host_game(player_name: String) -> void:
+	_send({
+		"type": "host_game",
+		"player_name": player_name,
 	})
 
 
@@ -52,6 +62,13 @@ func join_room(room_id: String, player_name: String, model_name: String) -> void
 		"room_id": room_id,
 		"player_name": player_name,
 		"model_name": model_name,
+		"avatar_index": Global.online_avatar_index,
+	})
+
+
+func request_match_history() -> void:
+	_send({
+		"type": "match_history",
 	})
 
 
@@ -88,6 +105,11 @@ func _read_packets() -> void:
 func _handle_message(payload: Dictionary) -> void:
 	var message_type := str(payload.get("type", ""))
 	match message_type:
+		"room_hosted":
+			room_hosted.emit(
+				str(payload.get("room_id", "")),
+				str(payload.get("spectator_id", ""))
+			)
 		"room_created":
 			room_created.emit(
 				str(payload.get("room_id", "")),
@@ -108,6 +130,9 @@ func _handle_message(payload: Dictionary) -> void:
 			move_result.emit(payload)
 		"game_over":
 			game_over.emit(payload)
+		"match_history":
+			var records = payload.get("records", [])
+			match_history.emit(records if records is Array else [])
 		"error":
 			server_error.emit(str(payload.get("code", "")), str(payload.get("message", "")))
 		_:
