@@ -5,7 +5,6 @@
 [ext_resource type="FontFile" uid="uid://fbh8tvoy7egm" path="res://fonts/slkscr.ttf" id="4_font"]
 [ext_resource type="FontFile" uid="uid://dhmwvny2scgqs" path="res://fonts/RubikGlitch-Regular.ttf" id="5_title_font"]
 
-
 [sub_resource type="StyleBoxFlat" id="ButtonNormal"]
 bg_color = Color(0.12, 0.45, 0.95, 0.28)
 border_width_left = 2
@@ -110,7 +109,6 @@ theme_override_styles/normal = SubResource("ButtonNormal")
 theme_override_styles/hover = SubResource("ButtonHover")
 theme_override_styles/pressed = SubResource("ButtonPressed")
 text = "JOIN ROOM"
-
 
 [node name="BackButton" type="Button" parent="."]
 layout_mode = 0

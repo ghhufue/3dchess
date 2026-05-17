@@ -1,12 +1,12 @@
 extends Control
 
 @export_file("*.tscn") var setup_scene_path := "res://Scenes/OnlinePlayerSetup.tscn"
+@export_file("*.tscn") var join_scene_path := "res://Scenes/OnlineJoinRoom.tscn"
 
 @onready var host_button: Button = get_node_or_null("Actions/HostButton")
 @onready var create_button: Button = get_node_or_null("Actions/CreateButton")
 @onready var join_button: Button = get_node_or_null("Actions/JoinButton")
 @onready var back_button: Button = get_node_or_null("BackButton")
-
 
 
 func _ready() -> void:
@@ -42,7 +42,7 @@ func _on_join_pressed() -> void:
 	Global.online_entry_action = "join"
 	Global.online_spectator = false
 	Global.online_create_room = false
-	get_tree().change_scene_to_file(setup_scene_path)
+	get_tree().change_scene_to_file(join_scene_path)
 
 
 func _on_back_pressed() -> void:

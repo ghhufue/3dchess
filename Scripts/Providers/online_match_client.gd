@@ -5,16 +5,18 @@ signal connection_failed(message: String)
 signal room_hosted(room_id: String, spectator_id: String)
 signal room_created(room_id: String, player_id: String, color: int)
 signal room_joined(room_id: String, player_id: String, color: int)
+signal room_state(payload: Dictionary)
 signal game_started(payload: Dictionary)
 signal turn_requested(payload: Dictionary)
 signal move_result(payload: Dictionary)
 signal game_over(payload: Dictionary)
 signal server_error(code: String, message: String)
 
-@export var server_url := "ws://127.0.0.1:9000/ws"
+@export var server_url := "ws://frp-cup.com:57190/ws"
 
 var socket := WebSocketPeer.new()
 var connected_to_server := false
+var connecting_to_server := false
 
 
 func _process(_delta: float) -> void:
@@ -24,8 +26,15 @@ func _process(_delta: float) -> void:
 	if state == WebSocketPeer.STATE_OPEN:
 		if not connected_to_server:
 			connected_to_server = true
+			connecting_to_server = false
 			connected.emit()
 		_read_packets()
+		return
+
+	if state == WebSocketPeer.STATE_CLOSED and connecting_to_server:
+		connecting_to_server = false
+		connected_to_server = false
+		connection_failed.emit("Failed to connect to match server")
 		return
 
 	if state == WebSocketPeer.STATE_CLOSED and connected_to_server:
@@ -33,10 +42,21 @@ func _process(_delta: float) -> void:
 
 
 func connect_to_server(url_override := "") -> void:
+	if socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
+		connected.emit()
+		return
+
 	var url := server_url if url_override.is_empty() else url_override
 	var err := socket.connect_to_url(url)
 	if err != OK:
+		connecting_to_server = false
 		connection_failed.emit("Failed to connect to match server: %s" % err)
+		return
+	connecting_to_server = true
+
+
+func is_connected_to_server() -> bool:
+	return socket.get_ready_state() == WebSocketPeer.STATE_OPEN
 
 
 func create_room(player_name: String, model_name: String) -> void:
@@ -44,7 +64,6 @@ func create_room(player_name: String, model_name: String) -> void:
 		"type": "create_room",
 		"player_name": player_name,
 		"model_name": model_name,
-		"avatar_index": Global.online_avatar_index,
 	})
 
 
@@ -61,9 +80,7 @@ func join_room(room_id: String, player_name: String, model_name: String) -> void
 		"room_id": room_id,
 		"player_name": player_name,
 		"model_name": model_name,
-		"avatar_index": Global.online_avatar_index,
 	})
-
 
 
 func send_move(room_id: String, request_id: String, row: int, col: int) -> void:
@@ -116,6 +133,8 @@ func _handle_message(payload: Dictionary) -> void:
 				str(payload.get("player_id", "")),
 				int(payload.get("color", 0))
 			)
+		"room_state":
+			room_state.emit(payload)
 		"game_start":
 			game_started.emit(payload)
 		"your_turn":

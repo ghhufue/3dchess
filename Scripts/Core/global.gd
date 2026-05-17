@@ -1,5 +1,7 @@
 extends Node
 
+const OnlineMatchClientScript = preload("res://Scripts/Providers/online_match_client.gd")
+
 var winner_text : String = ""
 var bot_name: String = "classic_rule" # classic_rule or reward_driven
 var game_mode: String = "human_vs_bot"   # "human_vs_bot" / "bot_vs_bot_step" / "online_model_vs_model"
@@ -19,7 +21,7 @@ var trained_model_path: String = ""
 var trained_model_label: String = ""
 var use_simple_pieces: bool = false
 
-var match_server_url: String = "ws://127.0.0.1:9000/ws"
+var match_server_url: String = "ws://frp-cup.com:57190/ws"
 var online_room_id: String = ""
 var online_join_room_id: String = ""
 var online_player_id: String = ""
@@ -37,3 +39,22 @@ var online_opponent_name: String = ""
 var online_opponent_avatar_index: int = 0
 var online_move_time_limit_sec: int = 30
 var online_show_coordinates: bool = true
+var online_lobby_connected: bool = false
+var online_pending_game_start: Dictionary = {}
+var online_pending_turn: Dictionary = {}
+
+var _online_match_client: Node = null
+
+
+func get_online_match_client() -> Node:
+	if not is_instance_valid(_online_match_client):
+		_online_match_client = Node.new()
+		_online_match_client.name = "OnlineMatchClient"
+		_online_match_client.set_script(OnlineMatchClientScript)
+		add_child(_online_match_client)
+	return _online_match_client
+
+
+func clear_online_pending_messages() -> void:
+	online_pending_game_start = {}
+	online_pending_turn = {}

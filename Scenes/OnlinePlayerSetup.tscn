@@ -2,11 +2,8 @@
 
 [ext_resource type="Script" path="res://Scripts/UI/online_player_setup.gd" id="1_setup"]
 [ext_resource type="Texture2D" path="res://UIpack/sky.png" id="2_sky"]
-[ext_resource type="Texture2D" uid="uid://ck6lnbw5ixmc2" path="res://UIpack/Icon1.png" id="3_avatar_a"]
-[ext_resource type="Texture2D" uid="uid://cc4ljgonb6yav" path="res://UIpack/icon2.png" id="4_avatar_b"]
-[ext_resource type="Texture2D" uid="uid://dc08ydfwiu05f" path="res://UIpack/Icon3.png" id="5_avatar_c"]
-[ext_resource type="FontFile" uid="uid://fbh8tvoy7egm" path="res://fonts/slkscr.ttf" id="6_font"]
-[ext_resource type="FontFile" uid="uid://dhmwvny2scgqs" path="res://fonts/RubikGlitch-Regular.ttf" id="7_title_font"]
+[ext_resource type="FontFile" uid="uid://fbh8tvoy7egm" path="res://fonts/slkscr.ttf" id="3_font"]
+[ext_resource type="FontFile" uid="uid://dhmwvny2scgqs" path="res://fonts/RubikGlitch-Regular.ttf" id="4_title_font"]
 
 [sub_resource type="StyleBoxFlat" id="PanelStyle"]
 bg_color = Color(0.06, 0.15, 0.21, 0.84)
@@ -21,6 +18,18 @@ corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 shadow_color = Color(0, 0.75, 1, 0.22)
 shadow_size = 14
+
+[sub_resource type="StyleBoxFlat" id="SlotStyle"]
+bg_color = Color(0.02, 0.08, 0.11, 0.72)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.66, 1, 1, 0.72)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
 [sub_resource type="StyleBoxFlat" id="ButtonNormal"]
 bg_color = Color(0.12, 0.45, 0.95, 0.28)
@@ -66,7 +75,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_setup")
-avatars = Array[Texture2D]([ExtResource("3_avatar_a"), ExtResource("4_avatar_b"), ExtResource("5_avatar_c")])
 
 [node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
@@ -82,130 +90,148 @@ stretch_mode = 6
 [node name="ModeLabel" type="Label" parent="."]
 layout_mode = 0
 offset_left = 96.0
-offset_top = 62.0
-offset_right = 920.0
-offset_bottom = 132.0
+offset_top = 58.0
+offset_right = 770.0
+offset_bottom = 128.0
 theme_override_colors/font_color = Color(0.78, 1, 1, 1)
-theme_override_fonts/font = ExtResource("7_title_font")
+theme_override_fonts/font = ExtResource("4_title_font")
 theme_override_font_sizes/font_size = 52
 text = "CREATE ROOM"
 
+[node name="RoomLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 760.0
+offset_top = 62.0
+offset_right = 1280.0
+offset_bottom = 126.0
+theme_override_colors/font_color = Color(0.9, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 38
+horizontal_alignment = 1
+text = "ROOM ------"
+
 [node name="SettingsButton" type="Button" parent="."]
 layout_mode = 0
-offset_left = 1690.0
+offset_left = 1620.0
 offset_top = 58.0
-offset_right = 1788.0
+offset_right = 1806.0
 offset_bottom = 132.0
-theme_override_fonts/font = ExtResource("6_font")
-theme_override_font_sizes/font_size = 36
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("ButtonNormal")
 theme_override_styles/hover = SubResource("ButtonHover")
 theme_override_styles/pressed = SubResource("ButtonPressed")
-text = "⚙"
+text = "SETTINGS"
 
 [node name="Players" type="HBoxContainer" parent="."]
 layout_mode = 0
-offset_left = 128.0
-offset_top = 210.0
-offset_right = 1788.0
-offset_bottom = 740.0
-theme_override_constants/separation = 120
+offset_left = 180.0
+offset_top = 220.0
+offset_right = 1740.0
+offset_bottom = 760.0
+theme_override_constants/separation = 150
 alignment = 1
 
-[node name="LocalProfile" type="Panel" parent="Players"]
-custom_minimum_size = Vector2(640, 500)
+[node name="LeftProfile" type="Panel" parent="Players"]
+custom_minimum_size = Vector2(600, 500)
 layout_mode = 2
 theme_override_styles/panel = SubResource("PanelStyle")
 
-[node name="VBox" type="VBoxContainer" parent="Players/LocalProfile"]
+[node name="VBox" type="VBoxContainer" parent="Players/LeftProfile"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 70.0
-offset_top = 48.0
+offset_top = 42.0
 offset_right = -70.0
-offset_bottom = -54.0
+offset_bottom = -50.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 34
 alignment = 1
 
-[node name="AvatarFrame" type="CenterContainer" parent="Players/LocalProfile/VBox"]
-custom_minimum_size = Vector2(0, 250)
+[node name="SlotFrame" type="Panel" parent="Players/LeftProfile/VBox"]
+custom_minimum_size = Vector2(250, 250)
 layout_mode = 2
+theme_override_styles/panel = SubResource("SlotStyle")
 
-[node name="AvatarButton" type="TextureButton" parent="Players/LocalProfile/VBox/AvatarFrame"]
-custom_minimum_size = Vector2(220, 220)
-layout_mode = 2
-
-[node name="AvatarImage" type="TextureRect" parent="Players/LocalProfile/VBox/AvatarFrame/AvatarButton"]
+[node name="IconLabel" type="Label" parent="Players/LeftProfile/VBox/SlotFrame"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("3_avatar_a")
-expand_mode = 1
-stretch_mode = 5
+theme_override_colors/font_color = Color(0.84, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 72
+text = "O\n/|\\"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="NameInput" type="LineEdit" parent="Players/LocalProfile/VBox"]
+[node name="NameInput" type="LineEdit" parent="Players/LeftProfile/VBox"]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "godot_model"
-placeholder_text = "Your display name"
+placeholder_text = "Your nickname"
 
-[node name="OpponentProfile" type="Panel" parent="Players"]
-visible = false
-custom_minimum_size = Vector2(640, 500)
+[node name="RightProfile" type="Panel" parent="Players"]
+custom_minimum_size = Vector2(600, 500)
 layout_mode = 2
 theme_override_styles/panel = SubResource("PanelStyle")
 
-[node name="VBox" type="VBoxContainer" parent="Players/OpponentProfile"]
+[node name="VBox" type="VBoxContainer" parent="Players/RightProfile"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 70.0
-offset_top = 48.0
+offset_top = 42.0
 offset_right = -70.0
-offset_bottom = -54.0
+offset_bottom = -50.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 34
 alignment = 1
 
-[node name="AvatarFrame" type="CenterContainer" parent="Players/OpponentProfile/VBox"]
-custom_minimum_size = Vector2(0, 250)
+[node name="SlotFrame" type="Panel" parent="Players/RightProfile/VBox"]
+custom_minimum_size = Vector2(250, 250)
 layout_mode = 2
+theme_override_styles/panel = SubResource("SlotStyle")
 
-[node name="AvatarPreview" type="TextureRect" parent="Players/OpponentProfile/VBox/AvatarFrame"]
-custom_minimum_size = Vector2(220, 220)
-layout_mode = 2
-texture = ExtResource("4_avatar_b")
-expand_mode = 1
-stretch_mode = 5
+[node name="IconLabel" type="Label" parent="Players/RightProfile/VBox/SlotFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.84, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 82
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="RoomInput" type="LineEdit" parent="Players/OpponentProfile/VBox"]
+[node name="NameInput" type="LineEdit" parent="Players/RightProfile/VBox"]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
-placeholder_text = "Room id"
-max_length = 6
+editable = false
+placeholder_text = "Waiting..."
 
 [node name="SetupStatus" type="Label" parent="."]
 layout_mode = 0
 offset_left = 174.0
-offset_top = 770.0
-offset_right = 1406.0
-offset_bottom = 840.0
+offset_top = 798.0
+offset_right = 1420.0
+offset_bottom = 858.0
 theme_override_colors/font_color = Color(0.92, 0.98, 1, 1)
-theme_override_fonts/font = ExtResource("6_font")
+theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 24
-text = "Create a room and wait for another player."
+text = "Set your name, then start the online room."
 autowrap_mode = 3
 
 [node name="BackButton" type="Button" parent="."]
@@ -214,7 +240,7 @@ offset_left = 110.0
 offset_top = 902.0
 offset_right = 330.0
 offset_bottom = 988.0
-theme_override_fonts/font = ExtResource("6_font")
+theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 30
 theme_override_styles/normal = SubResource("ButtonNormal")
 theme_override_styles/hover = SubResource("ButtonHover")
@@ -227,7 +253,7 @@ offset_left = 1510.0
 offset_top = 880.0
 offset_right = 1788.0
 offset_bottom = 996.0
-theme_override_fonts/font = ExtResource("7_title_font")
+theme_override_fonts/font = ExtResource("4_title_font")
 theme_override_font_sizes/font_size = 52
 theme_override_styles/normal = SubResource("ButtonNormal")
 theme_override_styles/hover = SubResource("ButtonHover")
@@ -258,7 +284,7 @@ theme_override_constants/separation = 16
 
 [node name="SettingsTitle" type="Label" parent="SettingsPanel/VBox"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("6_font")
+theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 26
 text = "MATCH SETTINGS"
 

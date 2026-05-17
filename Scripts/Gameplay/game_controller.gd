@@ -34,6 +34,8 @@ var pending_online_request_id := ""
 var pending_online_room_id := ""
 
 func _ready() -> void:
+	if Global.game_mode == "online_model_vs_model":
+		online_match_client = Global.get_online_match_client()
 	_reset_game()
 	_connect_nodes()
 	_configure_ui()
@@ -337,7 +339,24 @@ func _start_online_match() -> void:
 		_on_online_server_error("NO_CLIENT", "No online match client is configured")
 		return
 
+	if online_match_client.has_method("is_connected_to_server") and online_match_client.is_connected_to_server() and Global.online_room_id != "":
+		_resume_online_lobby_match()
+		return
+
 	online_match_client.connect_to_server(Global.match_server_url)
+
+
+func _resume_online_lobby_match() -> void:
+	if is_instance_valid(bot_label):
+		bot_label.text = "Online room %s" % Global.online_room_id
+
+	if not Global.online_pending_game_start.is_empty():
+		_on_online_game_started(Global.online_pending_game_start)
+		Global.online_pending_game_start = {}
+
+	if not Global.online_pending_turn.is_empty():
+		_on_online_turn_requested(Global.online_pending_turn)
+		Global.online_pending_turn = {}
 
 
 func _on_online_connected() -> void:
