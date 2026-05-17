@@ -5,7 +5,6 @@ signal connection_failed(message: String)
 signal room_hosted(room_id: String, spectator_id: String)
 signal room_created(room_id: String, player_id: String, color: int)
 signal room_joined(room_id: String, player_id: String, color: int)
-signal match_history(records: Array)
 signal game_started(payload: Dictionary)
 signal turn_requested(payload: Dictionary)
 signal move_result(payload: Dictionary)
@@ -66,11 +65,6 @@ func join_room(room_id: String, player_name: String, model_name: String) -> void
 	})
 
 
-func request_match_history() -> void:
-	_send({
-		"type": "match_history",
-	})
-
 
 func send_move(room_id: String, request_id: String, row: int, col: int) -> void:
 	_send({
@@ -130,9 +124,6 @@ func _handle_message(payload: Dictionary) -> void:
 			move_result.emit(payload)
 		"game_over":
 			game_over.emit(payload)
-		"match_history":
-			var records = payload.get("records", [])
-			match_history.emit(records if records is Array else [])
 		"error":
 			server_error.emit(str(payload.get("code", "")), str(payload.get("message", "")))
 		_:

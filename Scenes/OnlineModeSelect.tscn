@@ -1,24 +1,10 @@
 [gd_scene format=3 uid="uid://d2vw2qfe4iuvq"]
 
 [ext_resource type="Script" path="res://Scripts/UI/online_mode_select.gd" id="1_online_mode"]
-[ext_resource type="Script" path="res://Scripts/Providers/online_match_client.gd" id="2_history_client"]
 [ext_resource type="Texture2D" path="res://UIpack/sky.png" id="3_sky"]
 [ext_resource type="FontFile" uid="uid://fbh8tvoy7egm" path="res://fonts/slkscr.ttf" id="4_font"]
 [ext_resource type="FontFile" uid="uid://dhmwvny2scgqs" path="res://fonts/RubikGlitch-Regular.ttf" id="5_title_font"]
 
-[sub_resource type="StyleBoxFlat" id="PanelStyle"]
-bg_color = Color(0.06, 0.15, 0.21, 0.84)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.55, 0.95, 1, 0.62)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-shadow_color = Color(0, 0.75, 1, 0.22)
-shadow_size = 14
 
 [sub_resource type="StyleBoxFlat" id="ButtonNormal"]
 bg_color = Color(0.12, 0.45, 0.95, 0.28)
@@ -125,43 +111,6 @@ theme_override_styles/hover = SubResource("ButtonHover")
 theme_override_styles/pressed = SubResource("ButtonPressed")
 text = "JOIN ROOM"
 
-[node name="HistoryPanel" type="Panel" parent="."]
-layout_mode = 0
-offset_left = 720.0
-offset_top = 198.0
-offset_right = 1808.0
-offset_bottom = 900.0
-theme_override_styles/panel = SubResource("PanelStyle")
-
-[node name="Title" type="Label" parent="HistoryPanel"]
-layout_mode = 0
-offset_left = 32.0
-offset_top = 28.0
-offset_right = 1020.0
-offset_bottom = 78.0
-theme_override_colors/font_color = Color(0.85, 1, 1, 1)
-theme_override_fonts/font = ExtResource("4_font")
-theme_override_font_sizes/font_size = 32
-text = "MATCH RECORDS"
-
-[node name="StatusLabel" type="Label" parent="HistoryPanel"]
-layout_mode = 0
-offset_left = 34.0
-offset_top = 84.0
-offset_right = 1024.0
-offset_bottom = 126.0
-theme_override_colors/font_color = Color(0.68, 0.92, 0.96, 1)
-theme_override_fonts/font = ExtResource("4_font")
-theme_override_font_sizes/font_size = 20
-text = "Connecting..."
-
-[node name="HistoryList" type="ItemList" parent="HistoryPanel"]
-layout_mode = 0
-offset_left = 32.0
-offset_top = 146.0
-offset_right = 1050.0
-offset_bottom = 668.0
-theme_override_font_sizes/font_size = 22
 
 [node name="BackButton" type="Button" parent="."]
 layout_mode = 0
@@ -175,6 +124,3 @@ theme_override_styles/normal = SubResource("ButtonNormal")
 theme_override_styles/hover = SubResource("ButtonHover")
 theme_override_styles/pressed = SubResource("ButtonPressed")
 text = "< BACK"
-
-[node name="HistoryClient" type="Node" parent="."]
-script = ExtResource("2_history_client")
