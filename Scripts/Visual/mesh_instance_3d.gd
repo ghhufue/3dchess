@@ -1,23 +1,14 @@
 extends MeshInstance3D
 
-@export var swing_width: float = 0.12
-@export var swing_height: float = 0.10
-@export var swing_z: float = 0.08
-@export var speed: float = 1.8
+@export var color: Color = Color(0.24, 0.36, 0.30, 1.0)
+@export var roughness: float = 0.78
 
-var _original_position: Vector3
-var _angle: float = 0.0
 
 func _ready() -> void:
-	_original_position = global_position
+	if mesh == null:
+		return
 
-func _process(delta: float) -> void:
-	_angle += speed * delta
-
-	var offset = Vector3(
-		swing_width * cos(_angle),
-		swing_height * sin(_angle),
-		swing_z * sin(_angle),
-	)
-
-	global_position = _original_position + offset
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = color
+	mat.roughness = roughness
+	set_surface_override_material(0, mat)

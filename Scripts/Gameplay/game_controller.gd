@@ -16,6 +16,7 @@ const WHITE := -1
 @export var abort_button_path: NodePath = NodePath("../../UI/AbortButton")
 @export var next_step_button_path: NodePath = NodePath("../../UI/Button")
 @export var title_scene_path := "res://Scenes/3_dtitle.tscn"
+@export var online_result_scene_path := "res://Scenes/OnlineResult.tscn"
 
 @onready var board_view: Node = get_node_or_null(board_view_path)
 @onready var board_input: Node = get_node_or_null(board_input_path)
@@ -395,6 +396,15 @@ func _on_online_game_started(payload: Dictionary) -> void:
 	_load_board_from_server(payload.get("board", []))
 	current_player = int(payload.get("current_turn", BLACK))
 	game_over = false
+	Global.online_result = {
+		"room_id": str(payload.get("room_id", Global.online_room_id)),
+		"black_player": str(payload.get("black_player", "Black")),
+		"white_player": str(payload.get("white_player", "White")),
+		"black_model": str(payload.get("black_model", "")),
+		"white_model": str(payload.get("white_model", "")),
+		"local_color": Global.online_player_color,
+		"winner": EMPTY,
+	}
 	_update_online_opponent_from_payload(payload)
 
 	if is_instance_valid(bot_label):
@@ -466,12 +476,26 @@ func _on_online_move_result(payload: Dictionary) -> void:
 
 func _on_online_game_over(payload: Dictionary) -> void:
 	var winner := int(payload.get("winner", EMPTY))
-	var text := "Draw"
-	if winner == BLACK:
-		text = "Black model win"
-	elif winner == WHITE:
-		text = "White model win"
-	_end_game(text)
+	_store_online_result(winner, payload)
+	get_tree().change_scene_to_file(online_result_scene_path)
+
+
+func _store_online_result(winner: int, payload: Dictionary) -> void:
+	var result := Global.online_result.duplicate()
+	result["winner"] = winner
+	result["reason"] = str(payload.get("reason", ""))
+	result["local_color"] = Global.online_player_color
+	if not result.has("room_id"):
+		result["room_id"] = Global.online_room_id
+	if not result.has("black_player"):
+		result["black_player"] = "Black"
+	if not result.has("white_player"):
+		result["white_player"] = "White"
+	if not result.has("black_model"):
+		result["black_model"] = ""
+	if not result.has("white_model"):
+		result["white_model"] = ""
+	Global.online_result = result
 
 
 func _on_online_server_error(code: String, message: String) -> void:

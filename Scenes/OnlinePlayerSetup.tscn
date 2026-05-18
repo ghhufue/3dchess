@@ -31,6 +31,22 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
+[sub_resource type="StyleBoxFlat" id="StatusStyle"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+bg_color = Color(0.02, 0.08, 0.11, 0.58)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.65, 0.95, 1, 0.28)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
 [sub_resource type="StyleBoxFlat" id="ButtonNormal"]
 bg_color = Color(0.12, 0.45, 0.95, 0.28)
 border_width_left = 2
@@ -165,8 +181,8 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.84, 1, 1, 1)
 theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 72
-text = "O\n/|\\"
+theme_override_font_sizes/font_size = 64
+text = " O\n/|\\\n/ \\"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -231,6 +247,7 @@ offset_bottom = 858.0
 theme_override_colors/font_color = Color(0.92, 0.98, 1, 1)
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StatusStyle")
 text = "Set your name, then start the online room."
 autowrap_mode = 3
 

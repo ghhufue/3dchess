@@ -6,7 +6,7 @@
 [ext_resource type="FontFile" uid="uid://dhmwvny2scgqs" path="res://fonts/RubikGlitch-Regular.ttf" id="5_title_font"]
 
 [sub_resource type="StyleBoxFlat" id="ButtonNormal"]
-bg_color = Color(0.12, 0.45, 0.95, 0.28)
+bg_color = Color(0.12, 0.45, 0.95, 0.42)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -18,7 +18,7 @@ corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="ButtonHover"]
-bg_color = Color(0.1, 0.75, 1, 0.38)
+bg_color = Color(0.1, 0.75, 1, 0.52)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
@@ -30,7 +30,7 @@ corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="ButtonPressed"]
-bg_color = Color(0, 0.55, 0.8, 0.55)
+bg_color = Color(0, 0.55, 0.8, 0.68)
 border_width_left = 4
 border_width_top = 4
 border_width_right = 4
@@ -72,39 +72,40 @@ theme_override_fonts/font = ExtResource("5_title_font")
 theme_override_font_sizes/font_size = 52
 text = "ONLINE MATCH"
 
-[node name="Actions" type="VBoxContainer" parent="."]
+[node name="Actions" type="HBoxContainer" parent="."]
 layout_mode = 0
-offset_left = 100.0
-offset_top = 230.0
-offset_right = 620.0
-offset_bottom = 640.0
-theme_override_constants/separation = 34
+offset_left = 120.0
+offset_top = 410.0
+offset_right = 1800.0
+offset_bottom = 620.0
+theme_override_constants/separation = 42
+alignment = 1
 
 [node name="HostButton" type="Button" parent="Actions"]
-custom_minimum_size = Vector2(0, 94)
+custom_minimum_size = Vector2(500, 190)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_font")
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 48
 theme_override_styles/normal = SubResource("ButtonNormal")
 theme_override_styles/hover = SubResource("ButtonHover")
 theme_override_styles/pressed = SubResource("ButtonPressed")
 text = "HOST GAME"
 
 [node name="CreateButton" type="Button" parent="Actions"]
-custom_minimum_size = Vector2(0, 94)
+custom_minimum_size = Vector2(500, 190)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_font")
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 48
 theme_override_styles/normal = SubResource("ButtonNormal")
 theme_override_styles/hover = SubResource("ButtonHover")
 theme_override_styles/pressed = SubResource("ButtonPressed")
 text = "CREATE ROOM"
 
 [node name="JoinButton" type="Button" parent="Actions"]
-custom_minimum_size = Vector2(0, 94)
+custom_minimum_size = Vector2(500, 190)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_font")
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 48
 theme_override_styles/normal = SubResource("ButtonNormal")
 theme_override_styles/hover = SubResource("ButtonHover")
 theme_override_styles/pressed = SubResource("ButtonPressed")

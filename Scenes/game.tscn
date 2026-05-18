@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://b22xgtg0iug0s" path="res://Scripts/Camera/camera_rig.gd" id="9_h4fw4"]
 [ext_resource type="AudioStream" uid="uid://c2mkqro1rgnmq" path="res://sound/people.mp3" id="17_ewbju"]
 [ext_resource type="Script" path="res://Scripts/Providers/online_match_client.gd" id="18_online_match"]
+[ext_resource type="Script" path="res://Scripts/Visual/Linemesh_instance_3d.gd" id="19_board_grid"]
 
 [sub_resource type="Environment" id="Environment_i6g32"]
 background_mode = 1
@@ -73,13 +74,19 @@ theme_override_fonts/font = ExtResource("7_v158k")
 theme_override_font_sizes/font_size = 32
 text = "which model"
 
-[node name="BroadInput" type="Node" parent="." unique_id=668213895]
+[node name="BoardRoot" type="Node3D" parent="." unique_id=668213894]
+
+[node name="BoardGrid3D" type="Node3D" parent="BoardRoot"]
+script = ExtResource("19_board_grid")
+
+[node name="BoardInput" type="Node" parent="." unique_id=668213895]
 script = ExtResource("2_i6g32")
 
 [node name="Manager" type="Node" parent="." unique_id=1891480155]
 
-[node name="BroadView" type="Node" parent="Manager" unique_id=1043576748]
+[node name="BoardView" type="Node" parent="Manager" unique_id=1043576748]
 script = ExtResource("3_1l0tm")
+board_root_path = NodePath("../../BoardRoot")
 
 [node name="GameController" type="Node" parent="Manager" unique_id=1571615952]
 script = ExtResource("4_v158k")
@@ -99,6 +106,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.384713, 0)
 
 [node name="Camera3D" type="Camera3D" parent="CameraRig/Pivot" unique_id=1718063974]
 transform = Transform3D(1, 0, 0, 0, 0.7396311, 0.6730125, 0, -0.6730125, 0.7396311, 0.087785244, 7.417287, 14.42944)
+current = true
 keep_aspect = 0
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1004151996]

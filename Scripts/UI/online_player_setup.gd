@@ -1,10 +1,11 @@
 extends Control
 
 const EMPTY_SLOT := "?"
-const PLAYER_SLOT := "O\n/|\\"
+const PLAYER_SLOT := " O\n/|\\\n/ \\"
 
 @export_file("*.tscn") var online_menu_scene_path := "res://Scenes/OnlineModeSelect.tscn"
 @export_file("*.tscn") var join_scene_path := "res://Scenes/OnlineJoinRoom.tscn"
+@export_file("*.tscn") var model_select_scene_path := "res://Scenes/OnlineModelSelect.tscn"
 @export_file("*.tscn") var game_scene_path := "res://Scenes/game.tscn"
 
 @onready var room_label: Label = get_node_or_null("RoomLabel")
@@ -24,10 +25,11 @@ const PLAYER_SLOT := "O\n/|\\"
 
 var online_client: Node = null
 var lobby_started := false
+var room_full := false
 
 
 func _ready() -> void:
-	if Global.online_entry_action == "join":
+	if Global.online_entry_action == "join" and not _is_joined_lobby():
 		get_tree().call_deferred("change_scene_to_file", join_scene_path)
 		return
 
@@ -36,24 +38,27 @@ func _ready() -> void:
 	_connect_controls()
 	_connect_online_client()
 	_apply_initial_slots()
-	call_deferred("_start_lobby")
+	_apply_pending_room_state()
 
 
 func _configure_initial_values() -> void:
+	var joined_lobby := _is_joined_lobby()
 	Global.game_mode = "online_model_vs_model"
-	Global.clear_online_pending_messages()
-	Global.online_lobby_connected = false
-	Global.online_room_id = ""
-	Global.online_player_id = ""
-	Global.online_player_color = 0
+	if not joined_lobby:
+		Global.clear_online_pending_messages()
+		Global.online_lobby_connected = false
+		Global.online_room_id = ""
+		Global.online_player_id = ""
+		Global.online_player_color = 0
+	room_full = false
 
 	if is_instance_valid(mode_label):
 		mode_label.text = _mode_title()
 	if is_instance_valid(room_label):
-		room_label.text = "ROOM ------"
+		_update_room_label(Global.online_room_id)
 	if is_instance_valid(left_name):
 		left_name.text = Global.online_player_name
-		left_name.editable = Global.online_entry_action != "host"
+		left_name.editable = not joined_lobby and Global.online_entry_action != "host"
 	if is_instance_valid(right_name):
 		right_name.text = ""
 		right_name.editable = false
@@ -65,10 +70,10 @@ func _configure_initial_values() -> void:
 	if is_instance_valid(settings_panel):
 		settings_panel.visible = false
 	if is_instance_valid(setup_status):
-		setup_status.text = "Connecting to match server..."
+		setup_status.text = "Waiting for lobby state..." if joined_lobby else "Set your name, then start the online room."
 	if is_instance_valid(start_button):
-		start_button.text = "WAIT"
-		start_button.disabled = true
+		start_button.text = "START"
+		start_button.disabled = true if joined_lobby else Global.online_entry_action != "host" and Global.online_player_name.strip_edges() == ""
 
 
 func _connect_controls() -> void:
@@ -80,6 +85,8 @@ func _connect_controls() -> void:
 		start_button.pressed.connect(_on_start_pressed)
 	if is_instance_valid(back_button) and not back_button.pressed.is_connected(_on_back_pressed):
 		back_button.pressed.connect(_on_back_pressed)
+	if is_instance_valid(left_name) and not left_name.text_changed.is_connected(_on_player_name_changed):
+		left_name.text_changed.connect(_on_player_name_changed)
 
 
 func _connect_online_client() -> void:
@@ -95,6 +102,8 @@ func _connect_online_client() -> void:
 		online_client.room_created.connect(_on_room_created)
 	if online_client.has_signal("room_state") and not online_client.room_state.is_connected(_on_room_state):
 		online_client.room_state.connect(_on_room_state)
+	if online_client.has_signal("model_select") and not online_client.model_select.is_connected(_on_model_select):
+		online_client.model_select.connect(_on_model_select)
 	if online_client.has_signal("game_started") and not online_client.game_started.is_connected(_on_game_started):
 		online_client.game_started.connect(_on_game_started)
 	if online_client.has_signal("turn_requested") and not online_client.turn_requested.is_connected(_on_turn_requested):
@@ -104,6 +113,19 @@ func _connect_online_client() -> void:
 
 
 func _apply_initial_slots() -> void:
+	if _is_joined_lobby():
+		if Global.online_player_color == 1:
+			_set_slot(left_icon, true)
+			_set_slot(right_icon, false)
+			if is_instance_valid(left_name):
+				left_name.text = Global.online_player_name
+		else:
+			_set_slot(left_icon, false)
+			_set_slot(right_icon, true)
+			if is_instance_valid(right_name):
+				right_name.text = Global.online_player_name
+		return
+
 	if Global.online_entry_action == "host":
 		_set_slot(left_icon, false)
 		_set_slot(right_icon, false)
@@ -120,6 +142,9 @@ func _start_lobby() -> void:
 		return
 	_apply_settings()
 	if not _validate():
+		if is_instance_valid(start_button):
+			start_button.disabled = false
+			start_button.text = "START"
 		return
 
 	lobby_started = true
@@ -132,7 +157,21 @@ func _start_lobby() -> void:
 
 
 func _on_start_pressed() -> void:
+	if Global.online_lobby_connected:
+		_start_match()
+		return
 	_start_lobby()
+
+
+func _on_player_name_changed(new_text: String) -> void:
+	if lobby_started or Global.online_entry_action == "host":
+		return
+	Global.online_player_name = new_text.strip_edges()
+	if is_instance_valid(start_button):
+		start_button.disabled = Global.online_player_name == ""
+		start_button.text = "START"
+	if Global.online_player_name != "":
+		_set_status("Ready to create room.")
 
 
 func _on_online_connected() -> void:
@@ -165,10 +204,15 @@ func _on_room_created(room_id: String, player_id: String, color: int) -> void:
 	Global.online_lobby_connected = true
 	_update_room_label(room_id)
 	_set_status("Room %s. Waiting for the other player." % room_id)
+	if is_instance_valid(start_button):
+		start_button.disabled = true
+		start_button.text = "START"
 
 
 func _on_room_state(payload: Dictionary) -> void:
+	Global.online_pending_room_state = payload
 	_update_room_label(str(payload.get("room_id", Global.online_room_id)))
+	room_full = bool(payload.get("is_full", false))
 
 	var black_name := str(payload.get("black_player", ""))
 	var white_name := str(payload.get("white_player", ""))
@@ -180,15 +224,26 @@ func _on_room_state(payload: Dictionary) -> void:
 	if is_instance_valid(right_name):
 		right_name.text = white_name
 
-	if bool(payload.get("is_full", false)):
-		_set_status("Both players joined. Starting match...")
+	if room_full:
+		_set_status("Both players joined. Press START to begin." if _can_start_match() else "Both players joined. Waiting for host to start.")
+		if is_instance_valid(start_button):
+			start_button.disabled = not _can_start_match()
+			start_button.text = "START"
 	else:
 		_set_status("Waiting for players.")
+		if is_instance_valid(start_button):
+			start_button.disabled = true
+			start_button.text = "START"
 
 
 func _on_game_started(payload: Dictionary) -> void:
 	Global.online_pending_game_start = payload
 	get_tree().change_scene_to_file(game_scene_path)
+
+
+func _on_model_select(payload: Dictionary) -> void:
+	Global.online_pending_model_select = payload
+	get_tree().change_scene_to_file(model_select_scene_path)
 
 
 func _on_turn_requested(payload: Dictionary) -> void:
@@ -213,6 +268,24 @@ func _on_connection_failed(message: String) -> void:
 	if is_instance_valid(left_name):
 		left_name.editable = Global.online_entry_action != "host"
 	_set_status(message)
+
+
+func _start_match() -> void:
+	if not _can_start_match():
+		_set_status("Waiting for host to start.")
+		return
+	if not room_full:
+		_set_status("Waiting for the other player.")
+		return
+	if online_client == null or not online_client.has_method("start_game"):
+		_set_status("Online client cannot start the match.")
+		return
+
+	if is_instance_valid(start_button):
+		start_button.disabled = true
+		start_button.text = "WAIT"
+	_set_status("Starting match...")
+	online_client.start_game(Global.online_room_id)
 
 
 func _on_settings_pressed() -> void:
@@ -269,4 +342,19 @@ func _set_status(value: String) -> void:
 
 
 func _mode_title() -> String:
+	if Global.online_entry_action == "join":
+		return "JOIN ROOM"
 	return "HOST GAME" if Global.online_entry_action == "host" else "CREATE ROOM"
+
+
+func _is_joined_lobby() -> bool:
+	return Global.online_entry_action == "join" and Global.online_lobby_connected and Global.online_room_id.strip_edges() != ""
+
+
+func _can_start_match() -> bool:
+	return Global.online_entry_action != "join" and not Global.online_spectator
+
+
+func _apply_pending_room_state() -> void:
+	if not Global.online_pending_room_state.is_empty():
+		_on_room_state(Global.online_pending_room_state)

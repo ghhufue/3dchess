@@ -1,6 +1,8 @@
 extends Control
 
 @export_file("*.tscn") var online_menu_scene_path := "res://Scenes/OnlineModeSelect.tscn"
+@export_file("*.tscn") var setup_scene_path := "res://Scenes/OnlinePlayerSetup.tscn"
+@export_file("*.tscn") var model_select_scene_path := "res://Scenes/OnlineModelSelect.tscn"
 @export_file("*.tscn") var game_scene_path := "res://Scenes/game.tscn"
 
 @onready var name_input: LineEdit = get_node_or_null("Panel/VBox/NameInput")
@@ -45,6 +47,10 @@ func _connect_online_client() -> void:
 		online_client.connected.connect(_on_online_connected)
 	if online_client.has_signal("room_joined") and not online_client.room_joined.is_connected(_on_room_joined):
 		online_client.room_joined.connect(_on_room_joined)
+	if online_client.has_signal("room_state") and not online_client.room_state.is_connected(_on_room_state):
+		online_client.room_state.connect(_on_room_state)
+	if online_client.has_signal("model_select") and not online_client.model_select.is_connected(_on_model_select):
+		online_client.model_select.connect(_on_model_select)
 	if online_client.has_signal("game_started") and not online_client.game_started.is_connected(_on_game_started):
 		online_client.game_started.connect(_on_game_started)
 	if online_client.has_signal("turn_requested") and not online_client.turn_requested.is_connected(_on_turn_requested):
@@ -85,7 +91,17 @@ func _on_room_joined(room_id: String, player_id: String, color: int) -> void:
 	Global.online_player_color = color
 	Global.online_spectator = false
 	Global.online_lobby_connected = true
-	_set_status("Joined room %s. Waiting for match start..." % room_id)
+	_set_status("Joined room %s. Syncing lobby..." % room_id)
+
+
+func _on_room_state(payload: Dictionary) -> void:
+	Global.online_pending_room_state = payload
+	get_tree().change_scene_to_file(setup_scene_path)
+
+
+func _on_model_select(payload: Dictionary) -> void:
+	Global.online_pending_model_select = payload
+	get_tree().change_scene_to_file(model_select_scene_path)
 
 
 func _on_game_started(payload: Dictionary) -> void:

@@ -6,6 +6,7 @@ signal room_hosted(room_id: String, spectator_id: String)
 signal room_created(room_id: String, player_id: String, color: int)
 signal room_joined(room_id: String, player_id: String, color: int)
 signal room_state(payload: Dictionary)
+signal model_select(payload: Dictionary)
 signal game_started(payload: Dictionary)
 signal turn_requested(payload: Dictionary)
 signal move_result(payload: Dictionary)
@@ -17,6 +18,7 @@ signal server_error(code: String, message: String)
 var socket := WebSocketPeer.new()
 var connected_to_server := false
 var connecting_to_server := false
+var last_url := ""
 
 
 func _process(_delta: float) -> void:
@@ -32,9 +34,11 @@ func _process(_delta: float) -> void:
 		return
 
 	if state == WebSocketPeer.STATE_CLOSED and connecting_to_server:
+		var close_code := socket.get_close_code()
+		var close_reason := socket.get_close_reason()
 		connecting_to_server = false
 		connected_to_server = false
-		connection_failed.emit("Failed to connect to match server")
+		connection_failed.emit("Failed to connect to match server %s (code %s: %s)" % [last_url, close_code, close_reason])
 		return
 
 	if state == WebSocketPeer.STATE_CLOSED and connected_to_server:
@@ -47,10 +51,13 @@ func connect_to_server(url_override := "") -> void:
 		return
 
 	var url := server_url if url_override.is_empty() else url_override
+	last_url = url
+	socket = WebSocketPeer.new()
+	print("Connecting to match server: ", url)
 	var err := socket.connect_to_url(url)
 	if err != OK:
 		connecting_to_server = false
-		connection_failed.emit("Failed to connect to match server: %s" % err)
+		connection_failed.emit("Failed to connect to match server %s: %s" % [url, err])
 		return
 	connecting_to_server = true
 
@@ -79,6 +86,21 @@ func join_room(room_id: String, player_name: String, model_name: String) -> void
 		"type": "join_room",
 		"room_id": room_id,
 		"player_name": player_name,
+		"model_name": model_name,
+	})
+
+
+func start_game(room_id: String) -> void:
+	_send({
+		"type": "start_game",
+		"room_id": room_id,
+	})
+
+
+func select_model(room_id: String, model_name: String) -> void:
+	_send({
+		"type": "select_model",
+		"room_id": room_id,
 		"model_name": model_name,
 	})
 
@@ -135,6 +157,8 @@ func _handle_message(payload: Dictionary) -> void:
 			)
 		"room_state":
 			room_state.emit(payload)
+		"model_select":
+			model_select.emit(payload)
 		"game_start":
 			game_started.emit(payload)
 		"your_turn":

@@ -40,8 +40,11 @@ var online_opponent_avatar_index: int = 0
 var online_move_time_limit_sec: int = 30
 var online_show_coordinates: bool = true
 var online_lobby_connected: bool = false
+var online_pending_room_state: Dictionary = {}
+var online_pending_model_select: Dictionary = {}
 var online_pending_game_start: Dictionary = {}
 var online_pending_turn: Dictionary = {}
+var online_result: Dictionary = {}
 
 var _online_match_client: Node = null
 
@@ -56,5 +59,8 @@ func get_online_match_client() -> Node:
 
 
 func clear_online_pending_messages() -> void:
+	online_pending_room_state = {}
+	online_pending_model_select = {}
 	online_pending_game_start = {}
 	online_pending_turn = {}
+	online_result = {}
