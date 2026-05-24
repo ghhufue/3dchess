@@ -352,7 +352,7 @@ func _is_joined_lobby() -> bool:
 
 
 func _can_start_match() -> bool:
-	return Global.online_entry_action != "join" and not Global.online_spectator
+	return Global.online_entry_action == "host" or (Global.online_entry_action != "join" and not Global.online_spectator)
 
 
 func _apply_pending_room_state() -> void:

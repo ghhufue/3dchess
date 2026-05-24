@@ -28,19 +28,26 @@ func _ready() -> void:
 
 
 func _configure_initial_values() -> void:
+	local_ready = not _requires_local_model()
 	if is_instance_valid(room_label):
 		room_label.text = "ROOM %s" % Global.online_room_id
 	if is_instance_valid(player_label):
-		player_label.text = "%s  %s" % [_color_name(Global.online_player_color), Global.online_player_name]
+		if Global.online_spectator:
+			player_label.text = "HOST  %s" % Global.online_player_name
+		else:
+			player_label.text = "%s  %s" % [_color_name(Global.online_player_color), Global.online_player_name]
 	if is_instance_valid(model_name_input):
 		model_name_input.text = Global.online_model_name if Global.online_model_name != "" else "trained"
+		model_name_input.editable = _requires_local_model()
 	if is_instance_valid(model_path_label):
 		model_path_label.text = _model_path_text()
+	if is_instance_valid(select_model_button):
+		select_model_button.disabled = not _requires_local_model()
 	if is_instance_valid(status_label):
-		status_label.text = "Select your local model, then press START."
+		status_label.text = "Waiting for both players to select models." if Global.online_spectator else "Select your local model, then press START."
 	if is_instance_valid(start_button):
-		start_button.text = "START"
-		start_button.disabled = false
+		start_button.text = "READY" if Global.online_spectator else "START"
+		start_button.disabled = Global.online_spectator
 	if is_instance_valid(back_button):
 		back_button.text = "< BACK"
 	if is_instance_valid(file_dialog):
@@ -101,7 +108,7 @@ func _on_model_file_selected(path: String) -> void:
 
 
 func _on_start_pressed() -> void:
-	if not local_ready:
+	if _requires_local_model() and not local_ready:
 		_submit_model_ready()
 		return
 
@@ -120,7 +127,7 @@ func _on_start_pressed() -> void:
 
 
 func _submit_model_ready() -> void:
-	var model_name := model_name_input.text.strip_edges() if is_instance_valid(model_name_input) else Global.online_model_name
+	var model_name: String = model_name_input.text.strip_edges() if is_instance_valid(model_name_input) else Global.online_model_name
 	if model_name == "":
 		_set_status("Enter or select a model before starting.")
 		return
@@ -163,7 +170,7 @@ func _on_room_state(payload: Dictionary) -> void:
 				start_button.disabled = true
 				start_button.text = "READY"
 	elif local_ready:
-		_set_status("Model ready. Waiting for the other player.")
+		_set_status("Model ready. Waiting for the other player." if _requires_local_model() else "Waiting for both players to select models.")
 		if is_instance_valid(start_button):
 			start_button.disabled = true
 			start_button.text = "READY"
@@ -209,7 +216,11 @@ func _infer_engine_kind(path: String) -> String:
 
 
 func _can_start_match() -> bool:
-	return Global.online_entry_action != "join" and not Global.online_spectator
+	return Global.online_entry_action == "host" or (Global.online_entry_action != "join" and not Global.online_spectator)
+
+
+func _requires_local_model() -> bool:
+	return not Global.online_spectator
 
 
 func _color_name(color: int) -> String:

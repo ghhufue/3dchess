@@ -23,7 +23,7 @@ func _ready() -> void:
 
 
 func _apply_result() -> void:
-	var result := Global.online_result
+	var result: Dictionary = Global.online_result
 	var winner := int(result.get("winner", EMPTY))
 	var local_color := int(result.get("local_color", Global.online_player_color))
 	var black_name := str(result.get("black_player", "Black"))

@@ -292,8 +292,8 @@ func _mode_summary() -> String:
 
 
 func _player_description(player: int) -> String:
-	var player_type := Global.black_player_type if player == 1 else Global.white_player_type
-	var player_name := Global.black_player_name if player == 1 else Global.white_player_name
+	var player_type: String = Global.black_player_type if player == 1 else Global.white_player_type
+	var player_name: String = Global.black_player_name if player == 1 else Global.white_player_name
 	if player_type == "human":
 		return "Human"
 	return "%s:%s" % [player_type.capitalize(), player_name]

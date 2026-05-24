@@ -277,14 +277,14 @@ func _bot_name_for_player(player: int) -> String:
 	return _player_name_for_player(player)
 
 func _player_type_for_player(player: int) -> String:
-	var value := Global.black_player_type if player == BLACK else Global.white_player_type
+	var value: String = Global.black_player_type if player == BLACK else Global.white_player_type
 	value = str(value).strip_edges().to_lower()
 	if value in ["human", "bot", "model"]:
 		return value
 	return "human"
 
 func _player_name_for_player(player: int) -> String:
-	var value := Global.black_player_name if player == BLACK else Global.white_player_name
+	var value: String = Global.black_player_name if player == BLACK else Global.white_player_name
 	value = str(value).strip_edges()
 	if value != "":
 		return value
@@ -481,7 +481,7 @@ func _on_online_game_over(payload: Dictionary) -> void:
 
 
 func _store_online_result(winner: int, payload: Dictionary) -> void:
-	var result := Global.online_result.duplicate()
+	var result: Dictionary = Global.online_result.duplicate()
 	result["winner"] = winner
 	result["reason"] = str(payload.get("reason", ""))
 	result["local_color"] = Global.online_player_color

@@ -237,7 +237,7 @@ func _standard_material(color: Color, unshaded: bool) -> StandardMaterial3D:
 
 
 func _grid_start() -> Vector3:
-	return origin + Vector3(cell_size, 0.0, cell_size)
+	return origin
 
 
 func _span() -> float:
