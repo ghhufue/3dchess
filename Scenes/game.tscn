@@ -19,7 +19,7 @@
 
 [sub_resource type="Environment" id="Environment_i6g32"]
 background_mode = 1
-background_color = Color(0.50454825, 0.7674934, 0.7196731, 1)
+background_color = Color(0.74, 0.69, 0.61, 1)
 reflected_light_source = 1
 ssr_enabled = true
 adjustment_enabled = true

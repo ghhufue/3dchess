@@ -1,6 +1,6 @@
 extends MeshInstance3D
 
-@export var color: Color = Color(0.24, 0.36, 0.30, 1.0)
+@export var color: Color = Color(0.78, 0.55, 0.30, 1.0)
 @export var roughness: float = 0.78
 
 

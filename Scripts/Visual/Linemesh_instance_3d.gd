@@ -10,11 +10,11 @@ extends Node3D
 @export var line_y: float = 0.012
 @export var marker_y: float = 0.022
 
-@export var board_color: Color = Color(0.24, 0.36, 0.30, 1.0)
-@export var board_edge_color: Color = Color(0.11, 0.18, 0.15, 1.0)
-@export var line_color: Color = Color(0.82, 0.96, 0.88, 0.86)
-@export var star_color: Color = Color(0.95, 1.0, 0.92, 1.0)
-@export var point_color: Color = Color(0.78, 0.95, 0.86, 0.48)
+@export var board_color: Color = Color(0.78, 0.55, 0.30, 1.0)
+@export var board_edge_color: Color = Color(0.44, 0.25, 0.11, 1.0)
+@export var line_color: Color = Color(0.18, 0.10, 0.045, 0.9)
+@export var star_color: Color = Color(0.12, 0.065, 0.03, 1.0)
+@export var point_color: Color = Color(0.16, 0.085, 0.04, 0.36)
 
 @export var line_width: float = 0.026
 @export var border_width: float = 0.055
@@ -22,7 +22,7 @@ extends Node3D
 @export var star_radius: float = 0.105
 @export var marker_segments: int = 18
 
-@export var draw_all_intersection_points := true
+@export var draw_all_intersection_points := false
 @export var draw_star_points := true
 
 var _surface: MeshInstance3D
