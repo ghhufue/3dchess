@@ -12,11 +12,24 @@ const PLAYER_TYPE_MODEL := "model"
 @export_group("Service Startup")
 @export var auto_start_services := true
 @export var python_command := "python"
-@export var startup_poll_attempts := 12
+@export var startup_poll_attempts := 40
 @export var startup_poll_interval := 0.25
+@export var request_timeout_sec := 5.0
 
 var _awakened_bots: Dictionary = {}
 var _started_services: Dictionary = {}
+
+func warm_up_services(player_types: Array) -> void:
+	var service_types := {}
+	for player_type in player_types:
+		var resolved_type := str(player_type).strip_edges().to_lower()
+		if resolved_type == PLAYER_TYPE_BOT:
+			service_types[PLAYER_TYPE_BOT] = _trim_trailing_slash(bot_bridge_endpoint)
+		elif resolved_type == PLAYER_TYPE_MODEL:
+			service_types[PLAYER_TYPE_MODEL] = _trim_trailing_slash(model_endpoint)
+
+	for service_type in service_types.keys():
+		await _ensure_service_ready(str(service_type), str(service_types[service_type]))
 
 
 func request_move(
@@ -154,18 +167,36 @@ func _start_service(service_type: String) -> void:
 		_:
 			return
 
-	_start_hidden_process(working_dir, python_command, args)
+	var log_prefix := "godot_%s_service" % service_type
+	_start_hidden_process(working_dir, _resolve_python_command(), args, workspace_root, log_prefix)
 
 
-func _start_hidden_process(working_dir: String, command: String, args: PackedStringArray) -> void:
+func _resolve_python_command() -> String:
+	var configured := python_command.strip_edges()
+	if configured != "":
+		return configured
+	return "python"
+
+
+func _start_hidden_process(
+	working_dir: String,
+	command: String,
+	args: PackedStringArray,
+	workspace_root: String,
+	log_prefix: String
+) -> void:
 	var escaped_args := PackedStringArray()
 	for arg in args:
 		escaped_args.append("'%s'" % _escape_powershell_single_quoted(arg))
 
-	var ps_command := "Start-Process -WindowStyle Hidden -WorkingDirectory '%s' -FilePath '%s' -ArgumentList @(%s)" % [
+	var stdout_path := workspace_root.path_join("%s.out.log" % log_prefix)
+	var stderr_path := workspace_root.path_join("%s.err.log" % log_prefix)
+	var ps_command := "Start-Process -WindowStyle Hidden -WorkingDirectory '%s' -FilePath '%s' -ArgumentList @(%s) -RedirectStandardOutput '%s' -RedirectStandardError '%s'" % [
 		_escape_powershell_single_quoted(working_dir),
 		_escape_powershell_single_quoted(command),
-		",".join(escaped_args)
+		",".join(escaped_args),
+		_escape_powershell_single_quoted(stdout_path),
+		_escape_powershell_single_quoted(stderr_path)
 	]
 	var ps_args := PackedStringArray(["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps_command])
 	OS.create_process("powershell", ps_args)
@@ -177,6 +208,7 @@ func _post_json(url: String, payload: Dictionary) -> Dictionary:
 
 func _request_json(url: String, method: int, payload := {}) -> Dictionary:
 	var http := HTTPRequest.new()
+	http.timeout = request_timeout_sec
 	add_child(http)
 
 	var body := ""

@@ -7,6 +7,12 @@
 [ext_resource type="AudioStream" uid="uid://vygi8j0eys1p" path="res://sound/bo.mp3" id="7_1l0tm"]
 [ext_resource type="FontFile" uid="uid://hqpa84d2dqvp" path="res://fonts/Better VCR 9.0.1.ttf" id="7_v158k"]
 [ext_resource type="Script" uid="uid://b22xgtg0iug0s" path="res://Scripts/Camera/camera_rig.gd" id="9_h4fw4"]
+[ext_resource type="PackedScene" uid="uid://ccbe7ciawotll" path="res://Models/GLB format/stone-mountain.glb" id="11_o5yvi"]
+[ext_resource type="PackedScene" uid="uid://brds8hu7n3vr3" path="res://Models/GLB format/stone-rocks.glb" id="12_rfjv2"]
+[ext_resource type="PackedScene" uid="uid://cy1pke36gftu4" path="res://Models/GLB format/stone-hill.glb" id="13_1phco"]
+[ext_resource type="PackedScene" uid="uid://drb7kk7pvxbqo" path="res://Models/GLB format/water-rocks.glb" id="14_1phco"]
+[ext_resource type="PackedScene" uid="uid://cscwqd6fc1q2w" path="res://Models/GLB format/unit-wall-tower.glb" id="15_nnt18"]
+[ext_resource type="PackedScene" uid="uid://cu0auld54178l" path="res://Models/GLB format/unit-tree.glb" id="16_ewbju"]
 [ext_resource type="AudioStream" uid="uid://c2mkqro1rgnmq" path="res://sound/people.mp3" id="17_ewbju"]
 [ext_resource type="Script" path="res://Scripts/Providers/online_match_client.gd" id="18_online_match"]
 [ext_resource type="Script" path="res://Scripts/Visual/Linemesh_instance_3d.gd" id="19_board_grid"]
@@ -96,6 +102,62 @@ script = ExtResource("5_h4fw4")
 
 [node name="OnlineMatchClient" type="Node" parent="Manager" unique_id=1412186853]
 script = ExtResource("18_online_match")
+
+[node name="BG" type="Node3D" parent="."]
+
+[node name="BO" type="Node3D" parent="BG" unique_id=2029416543]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05154419, 0, 0)
+
+[node name="stone-mountain2" parent="BG/BO" unique_id=1574493442 instance=ExtResource("11_o5yvi")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -3.824315, -1.1260409, 0.7399602)
+
+[node name="stone-mountain3" parent="BG/BO" unique_id=565898342 instance=ExtResource("11_o5yvi")]
+transform = Transform3D(2.9999998, 0, 5.1961527, 0, 6, 0, -5.1961527, 0, 2.9999998, -3.758678, -1.6812236, 3.7854004)
+
+[node name="stone-mountain4" parent="BG/BO" unique_id=447339354 instance=ExtResource("11_o5yvi")]
+transform = Transform3D(7.7942286, 0, 4.5, 0, 9, 0, -4.5, 0, 7.7942286, 1.5739179, -0.9537878, -5.3757863)
+
+[node name="stone-rocks2" parent="BG/BO" unique_id=1317724658 instance=ExtResource("12_rfjv2")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -2.0617788, -1.3711343, 11.47439)
+
+[node name="stone-rocks3" parent="BG/BO" unique_id=1470511686 instance=ExtResource("12_rfjv2")]
+transform = Transform3D(0.1310978, 0, -5.9985676, 0, 6, 0, 5.9985676, 0, 0.1310978, 1.286, -1.365, 14.897)
+
+[node name="stone-hill2" parent="BG/BO" unique_id=654204119 instance=ExtResource("13_1phco")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -3.4863892, -1.3112538, 6.377756)
+
+[node name="unit-tree2" parent="BG/BO" unique_id=109163845 instance=ExtResource("16_ewbju")]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 1.5272353, 8.813768, -5.3819556)
+
+[node name="water-rocks2" parent="BG/BO" unique_id=650208454 instance=ExtResource("14_1phco")]
+transform = Transform3D(-3.0000005, 0, 5.196152, 0, 6, 0, -5.196152, 0, -3.0000005, 7.0025697, -0.7624029, -2.5914388)
+
+[node name="BO2" type="Node3D" parent="BG" unique_id=1463442540]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 13, 0, 13)
+
+[node name="stone-mountain2" parent="BG/BO2" unique_id=754731253 instance=ExtResource("11_o5yvi")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -3.824315, -1.1260409, 0.7399602)
+
+[node name="stone-mountain3" parent="BG/BO2" unique_id=980077475 instance=ExtResource("11_o5yvi")]
+transform = Transform3D(2.9999998, 0, 5.1961527, 0, 6, 0, -5.1961527, 0, 2.9999998, -3.758678, -1.6812236, 3.7854004)
+
+[node name="stone-mountain4" parent="BG/BO2" unique_id=2119125265 instance=ExtResource("11_o5yvi")]
+transform = Transform3D(7.7942286, 0, 4.5, 0, 9, 0, -4.5, 0, 7.7942286, 1.5739179, -0.9537878, -5.3757863)
+
+[node name="stone-rocks2" parent="BG/BO2" unique_id=352194859 instance=ExtResource("12_rfjv2")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -2.0617788, -1.3711343, 11.47439)
+
+[node name="stone-rocks3" parent="BG/BO2" unique_id=433375533 instance=ExtResource("12_rfjv2")]
+transform = Transform3D(0.1310978, 0, -5.9985676, 0, 6, 0, 5.9985676, 0, 0.1310978, 1.286, -1.365, 14.897)
+
+[node name="stone-hill2" parent="BG/BO2" unique_id=1837746926 instance=ExtResource("13_1phco")]
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, -3.4863892, -1.3112538, 6.377756)
+
+[node name="water-rocks3" parent="BG/BO2" unique_id=1613390640 instance=ExtResource("14_1phco")]
+transform = Transform3D(-2.9999993, 0, 5.196153, 0, 6, 0, -5.196153, 0, -2.9999993, 7.079809, -0.7624029, -2.499714)
+
+[node name="unit-wall-tower2" parent="BG/BO2" unique_id=472685547 instance=ExtResource("15_nnt18")]
+transform = Transform3D(-5, 0, 4.371139e-07, 0, 5, 0, -4.371139e-07, 0, -5, 1.5908289, 8.795767, -5.3414392)
 
 [node name="CameraRig" type="Node3D" parent="." unique_id=1946414270]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.4872146, 0, 6.514561)

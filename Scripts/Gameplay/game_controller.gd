@@ -40,6 +40,7 @@ func _ready() -> void:
 	_reset_game()
 	_connect_nodes()
 	_configure_ui()
+	call_deferred("_warm_up_local_services")
 
 func _reset_game() -> void:
 	board.clear()
@@ -120,11 +121,23 @@ func _configure_ui() -> void:
 	if Global.game_mode == "online_model_vs_model":
 		_start_online_match()
 
+
+func _warm_up_local_services() -> void:
+	if Global.game_mode == "online_model_vs_model":
+		return
+	if local_move_provider == null or not local_move_provider.has_method("warm_up_services"):
+		return
+
+	await local_move_provider.warm_up_services([
+		_player_type_for_player(BLACK),
+		_player_type_for_player(WHITE),
+	])
+
 func _on_abort_pressed() -> void:
 	_end_game("Game aborted")
 
 func _on_cell_clicked(row: int, col: int) -> void:
-	if game_over:
+	if game_over or ai_waiting:
 		return
 	if Global.game_mode == "online_model_vs_model":
 		return
@@ -132,11 +145,22 @@ func _on_cell_clicked(row: int, col: int) -> void:
 		return
 
 	var player := current_player
-	await _try_apply_move(row, col, player)
+	call_deferred("_handle_human_cell_clicked", row, col, player)
+
+
+func _handle_human_cell_clicked(row: int, col: int, player: int) -> void:
+	if game_over or ai_waiting:
+		return
+	if player != current_player:
+		return
+	if _player_type_for_player(player) != "human":
+		return
+
+	_try_apply_move(row, col, player)
 
 	if not game_over:
 		current_player = -player
-		_request_local_player_for_current_player()
+		await _request_local_player_for_current_player()
 
 func _on_next_step_pressed() -> void:
 	if Global.game_mode != "bot_vs_bot_step":
@@ -147,7 +171,7 @@ func _on_next_step_pressed() -> void:
 	if _player_type_for_player(current_player) == "human":
 		return
 
-	_request_local_player_for_current_player()
+	call_deferred("_request_local_player_for_current_player")
 
 func _request_local_player_for_current_player() -> void:
 	if game_over or ai_waiting:
@@ -175,7 +199,7 @@ func _request_local_player_for_current_player() -> void:
 		pending_ai_player = EMPTY
 		return
 
-	local_move_provider.request_move(
+	await local_move_provider.request_move(
 		board,
 		current_player,
 		player_type,
@@ -203,7 +227,7 @@ func _on_provider_move_ready(row: int, col: int) -> void:
 		player = current_player
 	pending_ai_player = EMPTY
 
-	await _try_apply_move(row, col, player)
+	_try_apply_move(row, col, player)
 	if not game_over:
 		current_player = -player
 
@@ -449,7 +473,7 @@ func _on_online_turn_requested(payload: Dictionary) -> void:
 
 	if local_move_provider != null and local_move_provider.has_method("request_move"):
 		ai_waiting = true
-		local_move_provider.request_move(
+		await local_move_provider.request_move(
 			board,
 			current_player,
 			"model",
