@@ -39,6 +39,8 @@ func _ready() -> void:
 	_connect_online_client()
 	_apply_initial_slots()
 	_apply_pending_room_state()
+	if Global.online_entry_action == "host" and not _is_joined_lobby():
+		call_deferred("_start_lobby")
 
 
 func _configure_initial_values() -> void:
@@ -70,10 +72,15 @@ func _configure_initial_values() -> void:
 	if is_instance_valid(settings_panel):
 		settings_panel.visible = false
 	if is_instance_valid(setup_status):
-		setup_status.text = "Waiting for lobby state..." if joined_lobby else "Set your name, then start the online room."
+		if joined_lobby:
+			setup_status.text = "Waiting for lobby state..."
+		elif Global.online_entry_action == "host":
+			setup_status.text = "Creating host room..."
+		else:
+			setup_status.text = "Set your name, then start the online room."
 	if is_instance_valid(start_button):
 		start_button.text = "START"
-		start_button.disabled = true if joined_lobby else Global.online_entry_action != "host" and Global.online_player_name.strip_edges() == ""
+		start_button.disabled = true if joined_lobby or Global.online_entry_action == "host" else Global.online_player_name.strip_edges() == ""
 
 
 func _connect_controls() -> void:

@@ -17,6 +17,7 @@ extends Control
 var online_client: Node = null
 var local_ready := false
 var all_ready := false
+var start_requested := false
 
 
 func _ready() -> void:
@@ -119,11 +120,7 @@ func _on_start_pressed() -> void:
 		_set_status("Waiting for both players to select models.")
 		return
 
-	if is_instance_valid(start_button):
-		start_button.disabled = true
-		start_button.text = "WAIT"
-	_set_status("Starting match...")
-	online_client.start_game(Global.online_room_id)
+	_start_match_if_ready()
 
 
 func _submit_model_ready() -> void:
@@ -160,6 +157,10 @@ func _on_room_state(payload: Dictionary) -> void:
 
 	if all_ready:
 		if _can_start_match():
+			if Global.online_entry_action == "host":
+				_set_status("Both models are ready. Starting match...")
+				_start_match_if_ready()
+				return
 			_set_status("Both models are ready. Press START to begin.")
 			if is_instance_valid(start_button):
 				start_button.disabled = false
@@ -186,6 +187,7 @@ func _on_turn_requested(payload: Dictionary) -> void:
 
 
 func _on_server_error(code: String, message: String) -> void:
+	start_requested = false
 	if is_instance_valid(start_button) and local_ready and _can_start_match():
 		start_button.disabled = false
 		start_button.text = "START"
@@ -217,6 +219,21 @@ func _infer_engine_kind(path: String) -> String:
 
 func _can_start_match() -> bool:
 	return Global.online_entry_action == "host" or (Global.online_entry_action != "join" and not Global.online_spectator)
+
+
+func _start_match_if_ready() -> void:
+	if start_requested:
+		return
+	if not all_ready:
+		return
+	if not _can_start_match():
+		return
+	start_requested = true
+	if is_instance_valid(start_button):
+		start_button.disabled = true
+		start_button.text = "WAIT"
+	_set_status("Starting match...")
+	online_client.start_game(Global.online_room_id)
 
 
 func _requires_local_model() -> bool:
