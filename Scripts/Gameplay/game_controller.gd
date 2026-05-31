@@ -432,10 +432,7 @@ func _on_online_game_started(payload: Dictionary) -> void:
 	_update_online_opponent_from_payload(payload)
 
 	if is_instance_valid(bot_label):
-		bot_label.text = "Online %s vs %s" % [
-			str(payload.get("black_model", "black")),
-			str(payload.get("white_model", "white")),
-		]
+		bot_label.text = _online_match_label(payload)
 
 
 func _update_online_opponent_from_payload(payload: Dictionary) -> void:
@@ -453,6 +450,26 @@ func _update_online_opponent_from_payload(payload: Dictionary) -> void:
 	else:
 		Global.online_opponent_name = "%s vs %s" % [black_name, white_name]
 		Global.online_opponent_avatar_index = black_avatar
+
+
+func _online_match_label(payload: Dictionary) -> String:
+	var black_name := str(payload.get("black_player", "Black"))
+	var white_name := str(payload.get("white_player", "White"))
+	var black_model := str(payload.get("black_model", ""))
+	var white_model := str(payload.get("white_model", ""))
+	return "BLACK %s%s  vs  WHITE %s%s" % [
+		black_name,
+		_model_suffix(black_model),
+		white_name,
+		_model_suffix(white_model),
+	]
+
+
+func _model_suffix(model_name: String) -> String:
+	var clean_name := model_name.strip_edges()
+	if clean_name == "":
+		return ""
+	return " [%s]" % clean_name
 
 
 func _on_online_turn_requested(payload: Dictionary) -> void:
